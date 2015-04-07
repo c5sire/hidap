@@ -5,6 +5,11 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
         collapsible = TRUE,
 
   tabPanel("Data", withMathJax(), uiOutput('ui_data')),
+  
+  navbarMenu("Analysis",
+             tabPanel("Single mean", uiOutput("single_mean")),
+             tabPanel("My analysis", uiOutput("my_analysis"))
+  ),
 
   navbarMenu("R",
     tabPanel("Report", uiOutput("report")),

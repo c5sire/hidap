@@ -99,7 +99,7 @@ output$ui_Manage <- renderUI({
         actionButton('removeDataButton', 'Remove data')
       )
     ),
-    help_modal('Manage','manageHelp',inclMD(file.path("..",app_dir,"tools/help/manage.md")))
+    help_modal('Manage','manageHelp',inclMD(file.path("..",app_dir,"tools","help","manage.md")))
   )
 })
 
@@ -333,17 +333,17 @@ output$ui_datasets <- renderUI({
   # Drop-down selection of data set
   tagList(
     selectInput(inputId = "dataset", label = "Datasets:", choices = r_data$datasetlist,
-      selected = state_init("dataset"), multiple = FALSE),
-    conditionalPanel(condition = "input.datatabs == 'Manage'",
-      checkboxInput("man_add_descr","Add/edit data description", FALSE),
-      conditionalPanel(condition = "input.man_add_descr == true",
-        actionButton('updateDescr', 'Update description')
-      ),
-      checkboxInput("man_rename_data","Rename data", FALSE),
-      conditionalPanel(condition = "input.man_rename_data == true",
-        uiOutput("uiRename")
-      )
-    )
+      selected = state_init("dataset"), multiple = FALSE)#,
+#     conditionalPanel(condition = "input.datatabs == 'Manage'",
+#       checkboxInput("man_add_descr","Add/edit data description", FALSE),
+#       conditionalPanel(condition = "input.man_add_descr == true",
+#         actionButton('updateDescr', 'Update description')
+#       ),
+#       checkboxInput("man_rename_data","Rename data", FALSE),
+#       conditionalPanel(condition = "input.man_rename_data == true",
+#         uiOutput("uiRename")
+#       )
+#     )
   )
 })
 

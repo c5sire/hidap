@@ -8,6 +8,8 @@
 # getting ip doesn't work - use shiny-resume when complete
 ip <- ifelse(running_local, "", session$request$REMOTE_ADDR)
 
+ex_data <- "sweetpotato"
+
 init_state <- function(r_data) {
 
   # initial plot height and width
@@ -18,11 +20,17 @@ init_state <- function(r_data) {
   # "Datasets can change over time (i.e. the changedata function). Therefore,
   # the data need to be a reactive value so the other reactive functions
   # and outputs that depend on these datasets will know when they are changed."
-  robj <- load(file.path("..",app_dir,"data/diamonds.rda"))
+  robj <- load(file.path("..",app_dir, paste0("data/",ex_data,".rda")))
   df <- get(robj)
-  r_data[["diamonds"]] <- df
-  r_data[["diamonds_descr"]] <- attr(df,'description')
-  r_data$datasetlist <- c("diamonds")
+  r_data[[ex_data]] <- df
+  
+  
+  r_data[[paste0(ex_data,"_descr")]] <- attr(df,'description')
+  r_data$datasetlist <- c(ex_data)
+  #r_data <- NULL
+  #attr(r_data, "description") <- attr(df,'description')
+  #r_data$datasetlist <- c("")
+  
   r_data
 }
 
@@ -116,7 +124,9 @@ if(running_local) {
     isolate({
       r_data[[df]] <- get(df, envir = .GlobalEnv)
       attr(r_data[[df]],'description')
-      r_data[[paste0(df,"_descr")]] <- attr(r_data[[df]],'description') %>% { if(is.null(.)) "No description provided. Please use Radiant to add an overview of the data in markdown format.\n Check the 'Add/edit data description' box on the left of your screen" else . }
+      r_data[[paste0(df,"_descr")]] <- attr(r_data[[df]],'description') %>% 
+      { if(is.null(.)) 
+          "No description provided. Please use Radiant to add an overview of the data in markdown format.\n Check the 'Add/edit data description' box on the left of your screen" else . }
       r_data$datasetlist %<>% c(df, .) %>% unique
       rm(list = df, envir = .GlobalEnv)
     })

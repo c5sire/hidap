@@ -18,8 +18,9 @@ output$ui_data <- renderUI({
         # based on https://groups.google.com/forum/?fromgroups=#!topic/shiny-discuss/PzlSAmAxxwo
         wellPanel(
           uiOutput("ui_datasets"),
-          conditionalPanel("input.datatabs != 'Manage'",
-            checkboxInput('show_filter', 'Filter (e.g., price > 5000)', value = state_init("show_filter",FALSE)),
+         conditionalPanel("input.datatabs == 'Manage1'",
+            checkboxInput('show_filter', 'Filter (e.g., price > 5000)', 
+                          value = state_init("show_filter",FALSE)),
             conditionalPanel("input.show_filter == true",
               returnTextAreaInput("data_filter", label = "", value = state_init("data_filter")),
               uiOutput("ui_filter_error")))
@@ -28,8 +29,8 @@ output$ui_data <- renderUI({
         conditionalPanel("input.datatabs == 'View'",uiOutput("ui_View")),
         conditionalPanel("input.datatabs == 'Visualize'", uiOutput("ui_Visualize")),
         conditionalPanel("input.datatabs == 'Pivot'",uiOutput("ui_Pivot")),
-        conditionalPanel("input.datatabs == 'Explore'", uiOutput("ui_Explore")),
-        conditionalPanel("input.datatabs == 'Transform'", uiOutput("ui_Transform"))),
+        conditionalPanel("input.datatabs == 'Explore'", uiOutput("ui_Explore"))),
+        #conditionalPanel("input.datatabs == 'Transform'", uiOutput("ui_Transform"))),
         #conditionalPanel("input.datatabs == 'Merge'", uiOutput("ui_Merge"))),
       mainPanel(
         uiOutput("datatabs")
@@ -47,8 +48,8 @@ output$datatabs <- renderUI({
     tabPanel("View", dataTableOutput("dataviewer")),
     tabPanel("Visualize",plotOutput("visualize", width = "100%", height = "100%")),
     tabPanel("Pivot", rpivotTable::rpivotTableOutput("pivotData")),
-    tabPanel("Explore", verbatimTextOutput("expl_summary"), plotOutput("expl_plots", width = "100%", height = "100%")),
-    tabPanel("Transform", htmlOutput("transform_data"), verbatimTextOutput("transform_summary"))#,
+    tabPanel("Explore", verbatimTextOutput("expl_summary"), plotOutput("expl_plots", width = "100%", height = "100%"))#,
+    #tabPanel("Transform", htmlOutput("transform_data"), verbatimTextOutput("transform_summary"))#,
     #tabPanel("Merge", htmlOutput("merge_possible"), htmlOutput("mergedata1"), htmlOutput("mergedata2"))
   )
 })

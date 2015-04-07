@@ -1,21 +1,32 @@
 #############################################
 # View table output of the selected dataset
 #############################################
+
+vars <- reactive({
+  validate(
+    need(!is.null(varnames()), "No dataset chosen!")
+  )
+  get(varnames())
+})
+
 output$uiView_vars <- renderUI({
   vars <- varnames()
+  #vars <- vars()
+  #print(vars)
   selectInput("view_vars", "Select variables to show:", choices  = vars,
     selected = state_multiple("view_vars",vars, vars), multiple = TRUE,
     selectize = FALSE, size = min(15, length(vars)))
 })
 
+#observe(output$uiView_vars)({
 output$ui_View <- renderUI({
   list(
     wellPanel(
       uiOutput("uiView_vars")
     ),
     help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
-  )
-})
+)}
+)
 
 output$dataviewer <- renderDataTable({
 
