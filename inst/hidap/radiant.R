@@ -280,7 +280,7 @@ help_modal <- function(modal_title, link, help_file) {
                   <h4 class='modal-title' id='%s_label'>%s</h4>
                   </div>
                 <div class='modal-body'>%s<br>
-                  &copy; Vincent Nijs (2015) <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank'><img alt='Creative Commons License' style='border-width:0' src ='imgs/80x15.png' /></a>
+                  &copy; International Potato Center (2015) <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank'><img alt='Creative Commons License' style='border-width:0' src ='imgs/80x15.png' /></a>
                 </div>
               </div>
             </div>
@@ -299,7 +299,7 @@ help_and_report <- function(modal_title, fun_name, help_file) {
                   <h4 class='modal-title' id='%s_help_label'>%s</h4>
                   </div>
                 <div class='modal-body'>%s<br>
-                  &copy; Vincent Nijs (2015) <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank'><img alt='Creative Commons License' style='border-width:0' src ='imgs/80x15.png' /></a>
+                  &copy; International Potato Center (2015) <a rel='license' href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank'><img alt='Creative Commons License' style='border-width:0' src ='imgs/80x15.png' /></a>
                 </div>
               </div>
             </div>

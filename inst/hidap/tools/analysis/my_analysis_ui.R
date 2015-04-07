@@ -100,10 +100,11 @@ output$ui_my_analysis <- renderUI({
 #     help_and_report(modal_title = 'Single mean', fun_name = 'single_mean',
 #                     help_file = inclMD("../quant/tools/help/single_mean.md")
     )
-#     ,
-#     help_and_report(modal_title = 'Single mean', fun_name = 'single_mean',
-#                     help_file = inclMD("../quant/tools/help/single_mean.md")
-#     )
+    ,
+    help_and_report(modal_title = 'My analysis', fun_name = 'my_analysis',
+                    help_file = inclMD(file.path("..",app_dir,"tools","help",
+                                    "my_analysis.md"))
+    )
   )
 })
 
