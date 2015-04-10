@@ -15,7 +15,7 @@ shinyServer(function(input, output, session) {
 	}
 
 	# source data & analysis tools
-  for(file in list.files(c("tools/app","tools/data", "tools/analysis"),
+  for(file in list.files(c("tools/app","tools/data", "tools/analysis", "tools/design"),
       pattern="\\.(r|R)$",
       full.names = TRUE)) {
 

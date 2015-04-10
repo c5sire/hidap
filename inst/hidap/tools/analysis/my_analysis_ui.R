@@ -112,13 +112,13 @@ output$ui_my_analysis <- renderUI({
 
 output$my_analysis <- renderUI({
   register_print_output("summary_my_analysis", ".summary_my_analysis")
-  register_plot_output("plot_my_analysis", ".plot_my_analysis",
-                        height_fun = "ma_plot_height")
+#   register_plot_output("plot_my_analysis", ".plot_my_analysis",
+#                         height_fun = "ma_plot_height")
   # two separate tabs
   ma_output_panels <- tabsetPanel(
     id = "tabs_my_analysis",
-    tabPanel("Summary", verbatimTextOutput("summary_my_analysis")),
-    tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
+    tabPanel("Summary", verbatimTextOutput("summary_my_analysis"))#,
+    #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
   )
   # one output with components stacked
   # sm_output_panels <- tagList(
