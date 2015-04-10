@@ -1,5 +1,6 @@
 #load("../../../data/primes.rda")
 library(agricolae)
+library(stringr)
 
 is_odd <- function(v){
   v %% 2 == 1
@@ -58,15 +59,21 @@ guess_k_by_r <- function(n){
 
 doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB", 
                            #"CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD"), 
-                trt = LETTERS[1:5], trt2 = NULL,
-                r = 2, k = 1,
+                trt = "A", trt2 = letters[1:8],
+                r = 2, k = 2,
                 first = FALSE, rowcol = FALSE,
                 name = "", continue = FALSE,
                 sub_design = "rcbd", #c("rcbd", "lsd", "crd"),
                 serie = 1, zigzag = TRUE,
                 seed = 0, kinds = "Super-Duper"){
   out <- NULL
-
+  
+  trt <- get_germplasm_ids(trt)
+  r <- as.integer(r)
+  zigzag <- as.logical(zigzag)
+  print(serie)
+  serie <- as.integer(serie)
+  
   if(design == "CRD"){
     out <- design.crd(trt, r, serie, seed, kinds)
   }
@@ -126,11 +133,16 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 
 
 summary.doe <- function(object, ...){
+  
+  x <- object$res
+  
   cat("Summary experimental design\n")
-  cat("Design:", object$res$parameter$design, "\n")
-  cat("Treatment 1 (n):", length(object$res$parameter$trt), "\n")
-  cat("r:", object$res$parameter$r, "\n")
-  cat("k:", object$res$parameter$k, "\n")
+  cat("Design:", x$parameter$design, "\n")
+  cat("Treatment 1 (n):", length(x$parameter$trt), "\n")
+  cat("r:", x$parameter$r, "\n")
+  cat("k:", x$parameter$k, "\n")
+  cat("book length:",nrow(x$book),"\n")
+  print(x$book)
 }
 
 

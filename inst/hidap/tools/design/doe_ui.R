@@ -11,6 +11,7 @@ doe_inputs <- reactive({
   }
   #print(doe_args)
   #if(!input$show_filter) doe_args$data_filter = ""
+  
   doe_args
 })
 
@@ -53,12 +54,26 @@ observe({
 output$ui_doe_par <- renderUI({
   choices <- c("Randomized Complete Block Design" = "RCBD",
                "Completely Randomized Design" = "CRD",
-               "Latin Square Design" = "LSD"
+               "Latin Square Design" = "LSD",
+               "Graeco-Latin Design" = "GLD",
+               "Youden Design" = "YD",
+               "Balanced Incomplete Block Design" = "BIB",
+               "Cyclic Design" = "CD",
+               "Lattice Design" = "LD",
+               "Alpha Design" = "AD",
+               "Augmented Block Design" = "ABD",
+               "Split-plot Design" = "SPPD",
+               "Strip-plot Design" = "STPD",
+               "Factorial Design" = "F2SPPD"
                )
   selectInput("design", "Design method:", choices, multiple = FALSE)
 })
 
-
+.doe_r_low <- reactive({
+  rl = 1
+  #if(input$design == "RCBD") rl = 2
+  rl
+})
 
 output$ui_doe <- renderUI({
   tagList(
@@ -72,9 +87,38 @@ output$ui_doe <- renderUI({
 #                      )
 #     ),
     wellPanel(
-      uiOutput("ui_doe_par")
+      uiOutput("ui_doe_par"),
+      selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
+                    multiple = FALSE),
+      checkboxInput("zigzag", "Zigzag:", TRUE),
+      radioButtons("serie", "Label series:", 
+                   c("11, 12, ...", "101, 102, ...", "1001, 1002, ..." ), 
+                   inline = TRUE),
+      
+      conditionalPanel(condition = "input.design == 'RCBD'",
+        wellPanel(
+          radioButtons("r", "r:", 2:5, 2, inline = TRUE)
+        )
+      ),
+      conditionalPanel(condition = "input.design == 'YD'",
+                       wellPanel(
+                         radioButtons("r", "r:", 1:5, 2, inline = TRUE)
+                       )
+      )
+      
+      ,
+      conditionalPanel(condition = "input.design == 'CRD'",
+                       wellPanel(
+                         selectInput("r", "r:", 
+                                     choices=c(1:5), selected = 2, multiple = TRUE,
+                                     selectize = TRUE)
+                       )
+      )
+      
+      
     )
-#     ,
+    
+      #     ,
 #     help_and_report(modal_title = 'Experimental design', fun_name = 'doe',
 #                     help_file = inclMD(file.path("..",app_dir,"tools","help",
 #                                                  "my_analysis.md"))
