@@ -88,31 +88,41 @@ output$ui_doe <- renderUI({
 #     ),
     wellPanel(
       uiOutput("ui_doe_par"),
-      selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
-                    multiple = FALSE),
       checkboxInput("zigzag", "Zigzag:", TRUE),
       radioButtons("serie", "Label series:", 
-                   c("11, 12, ...", "101, 102, ...", "1001, 1002, ..." ), 
+                   #get_series_labels(), "101, 102, ...", #get_series_labels()[[2]], 
+                   1:3, 2, 
                    inline = TRUE),
+      selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
+                    multiple = FALSE),
       
-      conditionalPanel(condition = "input.design == 'RCBD'",
+      conditionalPanel(condition = 
+        "input.design != 'LSD' &
+         input.design != 'GLD' &
+         input.design != 'BIB' ",
         wellPanel(
-          radioButtons("r", "r:", 2:5, 2, inline = TRUE)
+          radioButtons("r", "r:", 2:7, 2, inline = TRUE)
         )
       ),
-      conditionalPanel(condition = "input.design == 'YD'",
-                       wellPanel(
-                         radioButtons("r", "r:", 1:5, 2, inline = TRUE)
-                       )
-      )
-      
-      ,
-      conditionalPanel(condition = "input.design == 'CRD'",
-                       wellPanel(
-                         selectInput("r", "r:", 
-                                     choices=c(1:5), selected = 2, multiple = TRUE,
-                                     selectize = TRUE)
-                       )
+      conditionalPanel(condition =
+        "input.design == 'RCBD' |
+         input.design == 'LSD' |
+         input.design == 'YD' ",
+         checkboxInput("first", "Randomize first row:", FALSE)
+      ),
+      conditionalPanel(condition =
+        "input.design == 'RCBD' ",
+         checkboxInput("continue", "Continued labeling:", FALSE)
+      ),
+      conditionalPanel(condition =
+        "input.design == 'CD'",
+        checkboxInput("rowcol", "Row or column:", FALSE)
+      ),
+      conditionalPanel(condition =
+        "input.design == 'BIB' |
+         input.design == 'CD' |
+         input.design == 'AD' ",
+         selectInput("k", "k:", 2:10, 3)
       )
       
       

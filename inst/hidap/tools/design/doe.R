@@ -70,8 +70,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   
   trt <- get_germplasm_ids(trt)
   r <- as.integer(r)
+  k <- as.integer(k)
   zigzag <- as.logical(zigzag)
-  print(serie)
+  rowcol <- as.logical(rowcol)
+  first <- as.logical(first)
+  continue <- as.logical(continue)
+  
+  #print(serie)
   serie <- as.integer(serie)
   
   if(design == "CRD"){

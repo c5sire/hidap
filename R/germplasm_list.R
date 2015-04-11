@@ -16,5 +16,11 @@ get_germplasm_ids <- function(gp_list_id){
   LETTERS[1:x]
 }
 
+get_series_labels <- function(){
+  x <- as.list(c("11, 12, ...", "101, 102, ...", "1001, 1002, ..." ) )
+  names(x) <- 1:3
+  x
 }
+
+
 
