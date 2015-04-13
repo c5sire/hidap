@@ -147,10 +147,16 @@ summary.doe <- function(object, ...){
   cat("r:", x$parameter$r, "\n")
   cat("k:", x$parameter$k, "\n")
   cat("book length:",nrow(x$book),"\n")
-  print(x$book)
+  #print(x$book)
 }
 
 
+fieldbook.doe <- function(object, ...){
+  
+  x <- object$res
+  
+  x$book
+}
 
 
 

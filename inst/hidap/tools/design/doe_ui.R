@@ -24,6 +24,11 @@ doe_inputs <- reactive({
   out
 })
 
+.fieldbook_doe <- reactive({
+  out <- fieldbook.doe(.doe())
+  out
+})
+
 .doe <- reactive({
   do.call(doe, doe_inputs())
   
@@ -32,7 +37,7 @@ doe_inputs <- reactive({
 observe({
   if(not_pressed(input$doe_report)) return()
   isolate({
-    outputs <- c("summary", "plot")
+    outputs <- c("summary", "fb_draft", "plot")
     inp_out <- list(doe_plots = input$doe_plots) %>% list("",.)
     figs <- TRUE
     if(length(input$doe_plots) == 0) {
@@ -74,6 +79,8 @@ output$ui_doe_par <- renderUI({
   #if(input$design == "RCBD") rl = 2
   rl
 })
+
+output$fieldbook_doe <- renderDataTable(.fieldbook_doe())
 
 output$ui_doe <- renderUI({
   tagList(
@@ -140,12 +147,16 @@ output$ui_doe <- renderUI({
 
 output$doe <- renderUI({
   register_print_output("summary_doe", ".summary_doe")
+  #register_print_output("fieldbook_doe", ".fieldbook_doe")
+
 #   register_plot_output("plot_my_analysis", ".plot_my_analysis",
 #                        height_fun = "ma_plot_height")
   # two separate tabs
   doe_output_panels <- tabsetPanel(
     id = "tabs_doe",
-    tabPanel("Summary", verbatimTextOutput("summary_doe"))#,
+    tabPanel("Summary", verbatimTextOutput("summary_doe")),
+    tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+    #,
     #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
   )
   # one output with components stacked
