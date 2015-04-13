@@ -67,6 +67,7 @@ output$ui_doe_par <- renderUI({
                "Lattice Design" = "LD",
                "Alpha Design" = "AD",
                "Augmented Block Design" = "ABD",
+               "Augmented Partically Replicated Design" = "APRD",
                "Split-plot Design" = "SPPD",
                "Strip-plot Design" = "STPD",
                "Factorial Design" = "F2SPPD"
@@ -111,6 +112,13 @@ output$ui_doe <- renderUI({
           radioButtons("r", "r:", 2:7, 2, inline = TRUE)
         )
       ),
+      conditionalPanel(condition = 
+         "input.design == 'AD'",
+       wellPanel(
+          radioButtons("r", "r:", get_vr(doe_inputs()$trt), inline = TRUE)
+       )
+      ),
+      
       conditionalPanel(condition =
         "input.design == 'RCBD' |
          input.design == 'LSD' |
@@ -127,10 +135,20 @@ output$ui_doe <- renderUI({
       ),
       conditionalPanel(condition =
         "input.design == 'BIB' |
-         input.design == 'CD' |
-         input.design == 'AD' ",
+         input.design == 'CD' ",
          selectInput("k", "k:", 2:10, 3)
+      ),
+#       conditionalPanel(condition =
+#          "input.design == 'AD'",
+#        selectInput("k", "k:", get_vk(doe_inputs()$trt, doe_inputs()$r))
+#       ),
+      
+      conditionalPanel(condition =
+         "input.design == 'GLD'",
+         selectInput("trt2", "Treatment (Germplasm)", get_germplasm_lists() , 
+                     multiple = FALSE)
       )
+    
       
       
     )
@@ -146,19 +164,26 @@ output$ui_doe <- renderUI({
 
 
 output$doe <- renderUI({
+ 
   register_print_output("summary_doe", ".summary_doe")
   #register_print_output("fieldbook_doe", ".fieldbook_doe")
 
 #   register_plot_output("plot_my_analysis", ".plot_my_analysis",
 #                        height_fun = "ma_plot_height")
   # two separate tabs
+  
   doe_output_panels <- tabsetPanel(
     id = "tabs_doe",
-    tabPanel("Summary", verbatimTextOutput("summary_doe")),
-    tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+    withProgress(message = 'Creating fieldbook', value = 0.1, {
+      tabPanel("Summary", verbatimTextOutput("summary_doe"))
+    })  ,
+    withProgress(message = 'Creating fieldbook', value = 0.1, {  
+      tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+    })
     #,
     #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
   )
+
   # one output with components stacked
   # sm_output_panels <- tagList(
   # tabPanel("Summary", verbatimTextOutput("summary_single_mean")),
@@ -170,6 +195,7 @@ output$doe <- renderUI({
                  output_panels = doe_output_panels,
                  data = NULL)
   # add "data = NULL" if the app doesn't doesn't use data
+ 
 })
 
 

@@ -9,6 +9,7 @@ is_odd <- function(v){
 guess_k <- function(n) {
   k_upper <- sqrt(n)
   k_g <- round(k_upper,0)
+  #print(k_g)
   res <- logical(k_g)
   for(k in 3:k_g) {
     if(n %% k ==0) res[k] <- TRUE
@@ -37,6 +38,7 @@ valid_k <- function(trt, r = 2:4, k){
 }
 
 guess_k_by_r <- function(n){
+  n = as.integer(n)
   gk <- guess_k(n)
   
   rs <- list()
@@ -55,6 +57,22 @@ guess_k_by_r <- function(n){
   rs
 }
 
+get_vr <- function(n){
+  # get valid repetitions
+  n = length(n)
+  x <- guess_k_by_r(n)
+  y <- 1:length(x)
+  z <- sapply(x, length)
+  y[z>0]
+}
+
+get_vk <- function(n, r){
+  n = length(n)
+  r = as.integer(r)
+  x <- guess_k_by_r(n)
+  x[[r]]
+}
+
 #designs = c("RCBD", "CRD", "LSD", "GLD","YD","BIB", "CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD")
 
 doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB", 
@@ -68,7 +86,8 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 seed = 0, kinds = "Super-Duper"){
   out <- NULL
   
-  trt <- get_germplasm_ids(trt)
+  trt  <- get_germplasm_ids(trt)
+  trt2 <- get_germplasm_ids(trt2)
   r <- as.integer(r)
   k <- as.integer(k)
   zigzag <- as.logical(zigzag)
@@ -80,31 +99,32 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   serie <- as.integer(serie)
   
   if(design == "CRD"){
-    out <- design.crd(trt, r, serie, seed, kinds)
+    #out <- design.crd(trt, r, serie, seed, kinds)
+    out <- design_crd(trt, r, serie, seed, kinds)
   }
   
   if(design == "RCBD"){
-    out <- design.rcbd(trt, r, serie, seed, kinds, continue)
+    out <- design_rcbd(trt, r, serie, seed, kinds, continue)
   }
   
   if(design == "LSD"){
-    out <- design.lsd(trt, serie, seed, kinds, first)
+    out <- design_lsd(trt, serie, seed, kinds, first)
   }
   if(design == "GLD"){
-    out <- design.graeco(trt, trt2, serie, seed, kinds)
+    out <- design_gld(trt, trt2, serie, seed, kinds)
   }
   if(design == "YD"){
-    out <- design.youden(trt, r, serie, seed, kinds, first)
+    out <- design_yd(trt, r, serie, seed, kinds, first)
   }
   if(design == "BIB"){
-    out <- design.bib(trt, k, serie, seed, kinds)
+    out <- design_bib(trt, k, serie, seed, kinds)
   }
   if(design == "CD"){
-    if(length(trt) < 6 | length(trt) > 30 ) 
-      stop("There must be at least 6 and max 30 treatments.")
-    if(k < 2 | k > 10 ) 
-      stop("K must be > 1 and < 11.")
-    out <- design.cyclic(trt, k, r, serie, rowcol, seed, kinds)
+#     if(length(trt) < 6 | length(trt) > 30 ) 
+#       stop("There must be at least 6 and max 30 treatments.")
+#     if(k < 2 | k > 10 ) 
+#       stop("k must be > 1 and < 11.")
+    out <- design_cd(trt, k, r, rowcol, serie, seed, kinds)
   }
   if(design == "LD"){
     out <- design.lattice(trt, r, serie, seed, kinds)
@@ -124,6 +144,9 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "AB"){
     out <- design.ab(trt, r, serie, sub_design, seed, kinds, first)
   }
+  if(design == "APRD"){
+    out <- design_aprd(trt, trt2, frac, r, serie, seed, kinds)
+  }
   
   if(zigzag & (design != "CRD")){
     out$book <- zigzag(out)
@@ -140,12 +163,28 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 summary.doe <- function(object, ...){
   
   x <- object$res
-  
+  p <- x$parameter
+  names(p)[2] = "trt"
   cat("Summary experimental design\n")
-  cat("Design:", x$parameter$design, "\n")
-  cat("Treatment 1 (n):", length(x$parameter$trt), "\n")
-  cat("r:", x$parameter$r, "\n")
-  cat("k:", x$parameter$k, "\n")
+  cat("Design:", p$design, "\n")
+  cat("Label series:", p$serie, "\n")
+  cat("Zigzag:", p$zigzag, "\n")
+  cat("Treatment 1 (n):", length(p$trt), "\n")
+  if(p$design %in% c("GLD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+    cat("Treatment 1 (n):", length(p$trt2), "\n")  
+  }
+  if(toupper(p$design) %in% c("RCBD", "CRD", "YD", "CD", "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+    cat("r:", p$r, "\n")  
+  }
+  if(toupper(p$design) %in% c("BIB","CD", "AD" )){
+    cat("k:", p$k, "\n")  
+  }
+  if(toupper(p$design) %in% c("RCBD", "LSD", "YD", "SPPD", "F2SPPD" )){
+    cat("Randomize first row:", p$first, "\n")  
+  }
+  
+  cat("randomization algorithm:", p$kind, "\n")
+  cat("randomization seed number:", p$seed, "\n")
   cat("book length:",nrow(x$book),"\n")
   #print(x$book)
 }
