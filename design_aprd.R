@@ -40,14 +40,24 @@ design_bib <- function(trt, k, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
   if(n < 4) stop("The number of treatments in a YD must be > 3.")
-  design.bib(trt, r, ...)
+  design.bib(trt, k, ...)
 }
 
-design_cd <- function(trt, k, r, rowcol, ...){
+design_cd <- function(trt, r, k, rowcol, ...){
   n = length(trt)
   if(n < 6 | n > 30) stop("The number of treatments in a CD must be > 5 and < 31.")
   if(k < 2 | k > 10) stop("k in a CD must be > 1 and < 11.")
+  if(r %% k !=0) stop("r must be a multiple of k.")
   design.cyclic(trt, k, r, rowcol = rowcol, ...)
+}
+
+design_ld <- function(trt, r, ...){
+  n = length(trt)
+  #stopifnot(n > 3 & n < 10)
+  if(n < 4) stop("The number of treatments in a LD must be > 3.")
+  if(r < 2 | r > 3) stop("The value of r must be 2 or 3.")
+  if(n %% r != 0) stop("The number of treatments must be a multiple of r.")
+  design.lattice(trt, r, ...)
 }
 
 design_aprd <- function(trt1, trt2, frac = 0.3, r=2, ... 

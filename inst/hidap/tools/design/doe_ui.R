@@ -11,7 +11,7 @@ doe_inputs <- reactive({
   }
   #print(doe_args)
   #if(!input$show_filter) doe_args$data_filter = ""
-  
+  #print(doe_args)
   doe_args
 })
 
@@ -56,6 +56,7 @@ observe({
 })
 
 
+
 output$ui_doe_par <- renderUI({
   choices <- c("Randomized Complete Block Design" = "RCBD",
                "Completely Randomized Design" = "CRD",
@@ -75,11 +76,20 @@ output$ui_doe_par <- renderUI({
   selectInput("design", "Design method:", choices, multiple = FALSE)
 })
 
-.doe_r_low <- reactive({
-  rl = 1
-  #if(input$design == "RCBD") rl = 2
-  rl
-})
+# .doe_r_low <- reactive({
+#   rl = 1
+#   #if(input$design == "RCBD") rl = 2
+#   rl
+# })
+
+# get_r_range <- function(doe) {
+#   des <-doe$design
+#   if(is.null(des)) des = "RCBD"
+#   print(des)
+#   if(des == "CRD") return(2:4)
+#   if(des == "RCBD") return(2:10)
+# }
+
 
 output$fieldbook_doe <- renderDataTable(.fieldbook_doe())
 
@@ -103,51 +113,79 @@ output$ui_doe <- renderUI({
                    inline = TRUE),
       selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
                     multiple = FALSE),
-      
       conditionalPanel(condition = 
-        "input.design != 'LSD' &
-         input.design != 'GLD' &
-         input.design != 'BIB' ",
-        wellPanel(
-          radioButtons("r", "r:", 2:7, 2, inline = TRUE)
-        )
+        "input.design == 'CRD'",
+        radioButtons("r", "r:", 2:4, 2, inline = TRUE)
       ),
-      conditionalPanel(condition = 
-         "input.design == 'AD'",
-       wellPanel(
-          radioButtons("r", "r:", get_vr(doe_inputs()$trt), inline = TRUE)
+      conditionalPanel(condition =  "input.design == 'RCBD' ", 
+        wellPanel(
+        selectInput("rcbd_r", "r:", 2:10, 2),
+        checkboxInput("rcbd_first", "Randomize first block", FALSE), 
+        checkboxInput("rcbd_continue", "Use continuous numeration", FALSE) 
        )
       ),
-      
-      conditionalPanel(condition =
-        "input.design == 'RCBD' |
-         input.design == 'LSD' |
-         input.design == 'YD' ",
-         checkboxInput("first", "Randomize first row:", FALSE)
-      ),
-      conditionalPanel(condition =
-        "input.design == 'RCBD' ",
-         checkboxInput("continue", "Continued labeling:", FALSE)
-      ),
-      conditionalPanel(condition =
-        "input.design == 'CD'",
-        checkboxInput("rowcol", "Row or column:", FALSE)
-      ),
-      conditionalPanel(condition =
-        "input.design == 'BIB' |
-         input.design == 'CD' ",
-         selectInput("k", "k:", 2:10, 3)
-      ),
-#       conditionalPanel(condition =
-#          "input.design == 'AD'",
-#        selectInput("k", "k:", get_vk(doe_inputs()$trt, doe_inputs()$r))
-#       ),
-      
-      conditionalPanel(condition =
-         "input.design == 'GLD'",
-         selectInput("trt2", "Treatment (Germplasm)", get_germplasm_lists() , 
-                     multiple = FALSE)
+      conditionalPanel(condition =  "input.design == 'LSD' ", 
+       wellPanel(
+         selectInput("lsd_r", "r:", 2:5, 2)
+       )
       )
+      
+#       conditionalPanel(condition = 
+#       " (input.design == 'CRD' |
+#          input.design == 'RCBD' |
+#          input.design == 'YD' )",
+#         
+#           radioButtons("r", "r:", 2:7, 2, inline = TRUE)
+#         
+#       ),
+#       conditionalPanel(condition = 
+#          "input.design == 'AD'",
+#           radioButtons("r", "r:", 2:4, 2, inline = TRUE)
+#       ),
+#       conditionalPanel(condition = 
+#          "input.design == 'LD'",
+#           radioButtons("r", "r:", 2:3, 2, inline = TRUE)
+#       ),
+#       conditionalPanel(condition = 
+#          "input.design == 'CD'",
+#          wellPanel(
+#           radioButtons("r", "r:", c(2,4,6,8), 2, inline = TRUE),
+#           selectInput("k", "k:", 2:10, 2)
+#          )
+#          
+#       ),
+#       
+#       conditionalPanel(condition =
+#         "input.design == 'RCBD' |
+#          input.design == 'LSD' |
+#          input.design == 'YD' ",
+#          checkboxInput("first", "Randomize first row:", FALSE)
+#       ),
+#       conditionalPanel(condition =
+#         "input.design == 'RCBD' ",
+#          checkboxInput("continue", "Continued labeling:", FALSE)
+#       ),
+#       conditionalPanel(condition =
+#         "input.design == 'CD'",
+#         checkboxInput("rowcol", "Row or column:", FALSE)
+#       ),
+#       conditionalPanel(condition =
+#         "input.design == 'BIB' |
+#          input.design == 'AD'
+#         ",
+#          selectInput("k", "k:", 2:10, 3)
+#       ),
+# #       conditionalPanel(condition =
+# #          "input.design == 'AD'",
+# #          #selectInput("k", "k:", guess_k(length(doe_inputs()$trt)))
+# #          selectInput("k", "k:", 2:10, 2)
+# #       ),
+#       
+#       conditionalPanel(condition =
+#          "input.design == 'GLD'",
+#          selectInput("trt2", "Treatment (Germplasm)", get_germplasm_lists() , 
+#                      multiple = FALSE)
+#       )
     
       
       

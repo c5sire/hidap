@@ -7,11 +7,17 @@ is_odd <- function(v){
 }
 
 guess_k <- function(n) {
+  n = as.integer(n)
+  if(n == 0) return(2)
+  #cat(n, "\n")
   k_upper <- sqrt(n)
   k_g <- round(k_upper,0)
   #print(k_g)
   res <- logical(k_g)
+  
   for(k in 3:k_g) {
+    #cat(n, "\n")
+    #cat(k, "\n")
     if(n %% k ==0) res[k] <- TRUE
   }
   x <- 1:k_g
@@ -20,7 +26,8 @@ guess_k <- function(n) {
   r
 }
 
-valid_k <- function(trt, r = 2:4, k){
+valid_k <- function(trt, r = c(2,3,4), k){
+  #cat(r)
   n <- length(trt)
   if(n < 8) return(FALSE)
   if(n %% k != 0 ) return(FALSE)
@@ -79,21 +86,41 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                            #"CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD"), 
                 trt = "A", trt2 = letters[1:8],
                 r = 2, k = 2,
-                first = FALSE, rowcol = FALSE,
-                name = "", continue = FALSE,
+                rowcol = FALSE,
+                name = "", 
                 sub_design = "rcbd", #c("rcbd", "lsd", "crd"),
                 serie = 1, zigzag = TRUE,
-                seed = 0, kinds = "Super-Duper"){
+                seed = 0, kinds = "Super-Duper", 
+                
+                rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
+                lsd_r=2, lsd_first = FALSE
+                ){
   out <- NULL
   
+  r <- as.integer(r)
   trt  <- get_germplasm_ids(trt)
   trt2 <- get_germplasm_ids(trt2)
-  r <- as.integer(r)
+  first <- FALSE
+  continue <- FALSE
+  if(design == "RCBD"){
+    r <- as.integer(rcbd_r) 
+    first <- as.logical(rcbd_first)
+    continue <- as.logical(rcbd_continue)
+  }
+  if(design == "CRD"){
+    r <- as.integer(r)  
+  }
+  if(design == "LSD"){
+    r <- as.integer(lsd_r) 
+    first <- as.logical(lsd_first)
+  }
+  
+  
   k <- as.integer(k)
   zigzag <- as.logical(zigzag)
   rowcol <- as.logical(rowcol)
-  first <- as.logical(first)
-  continue <- as.logical(continue)
+#  first <- as.logical(first)
+
   
   #print(serie)
   serie <- as.integer(serie)
@@ -104,7 +131,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
   
   if(design == "RCBD"){
-    out <- design_rcbd(trt, r, serie, seed, kinds, continue)
+    out <- design_rcbd(trt, r, serie, seed, kinds, first, continue)
   }
   
   if(design == "LSD"){
@@ -120,14 +147,10 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     out <- design_bib(trt, k, serie, seed, kinds)
   }
   if(design == "CD"){
-#     if(length(trt) < 6 | length(trt) > 30 ) 
-#       stop("There must be at least 6 and max 30 treatments.")
-#     if(k < 2 | k > 10 ) 
-#       stop("k must be > 1 and < 11.")
-    out <- design_cd(trt, k, r, rowcol, serie, seed, kinds)
+    out <- design_cd(trt, r, k, rowcol, serie, seed, kinds)
   }
   if(design == "LD"){
-    out <- design.lattice(trt, r, serie, seed, kinds)
+    out <- design_ld(trt, r, serie, seed, kinds)
   }
   if(design == "AD"){
     out <- design.alpha(trt, k, r, serie, seed, kinds)
@@ -163,8 +186,15 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 summary.doe <- function(object, ...){
   
   x <- object$res
-  p <- x$parameter
+  if("parameter" %in% names(x)) {
+    p <- x$parameter  
+    
+  } else {
+    p <- x$parameter
+  }
+  
   names(p)[2] = "trt"
+  
   cat("Summary experimental design\n")
   cat("Design:", p$design, "\n")
   cat("Label series:", p$serie, "\n")
@@ -179,8 +209,11 @@ summary.doe <- function(object, ...){
   if(toupper(p$design) %in% c("BIB","CD", "AD" )){
     cat("k:", p$k, "\n")  
   }
-  if(toupper(p$design) %in% c("RCBD", "LSD", "YD", "SPPD", "F2SPPD" )){
+  if(toupper(p$design) %in% c("RCBD", "YD", "SPPD", "F2SPPD" )){
     cat("Randomize first row:", p$first, "\n")  
+  }
+  if(toupper(p$design) %in% c("RCBD" )){
+    cat("Continuous numeration:", p$continue, "\n")  
   }
   
   cat("randomization algorithm:", p$kind, "\n")

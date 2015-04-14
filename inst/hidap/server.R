@@ -1,3 +1,5 @@
+library("radiant")
+
 shinyServer(function(input, output, session) {
 
   # source shared functions
