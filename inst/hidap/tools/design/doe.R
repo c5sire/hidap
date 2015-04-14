@@ -94,6 +94,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
                 lsd_r=2, lsd_first = FALSE
+                
                 ){
   out <- NULL
   
@@ -114,7 +115,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
-  
+ 
   
   k <- as.integer(k)
   zigzag <- as.logical(zigzag)

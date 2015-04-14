@@ -128,7 +128,12 @@ output$ui_doe <- renderUI({
        wellPanel(
          selectInput("lsd_r", "r:", 2:5, 2)
        )
+      ),
+      conditionalPanel(condition =  "input.design == 'GLD' ", 
+         selectInput("trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
+                                           multiple = FALSE)
       )
+      
       
 #       conditionalPanel(condition = 
 #       " (input.design == 'CRD' |
