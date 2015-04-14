@@ -39,7 +39,7 @@ design_yd <- function(trt, r, ...){
 design_bib <- function(trt, k, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4) stop("The number of treatments in a YD must be > 3.")
+  if(n < 4 & n > 30) stop("The number of treatments in a BID must be > 3 and <=30.")
   design.bib(trt, k, ...)
 }
 

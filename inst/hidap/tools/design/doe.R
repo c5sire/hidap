@@ -95,7 +95,8 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
                 lsd_r=2, lsd_first = FALSE,
                 gld_trt2 = "A",
-                yd_r = 2, yd_first = FALSE
+                yd_r = 2, yd_first = FALSE,
+                bib_k=4
                 ){
   out <- NULL
   
@@ -122,6 +123,9 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "YD"){
     r <- as.integer(yd_r) 
     first <- as.logical(yd_first)
+  }
+  if(design == "BIB"){
+    k <- as.integer(bib_k)  
   }
   
   

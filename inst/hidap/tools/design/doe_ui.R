@@ -138,6 +138,9 @@ output$ui_doe <- renderUI({
            selectInput("yd_r", "r:", 2:11, 2),
            checkboxInput("yd_first", "Randomize first block", TRUE)
          )
+      ),
+      conditionalPanel(condition =  "input.design == 'BIB' ", 
+         selectInput("bib_k", "k:", 4:30, 4)
       )
       
       
