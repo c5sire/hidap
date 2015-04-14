@@ -96,7 +96,8 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 lsd_r=2, lsd_first = FALSE,
                 gld_trt2 = "A",
                 yd_r = 2, yd_first = FALSE,
-                bib_k=4
+                bib_k=4,
+                cd_k = 2, cd_r = 6
                 ){
   out <- NULL
   
@@ -105,6 +106,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   trt2 <- get_germplasm_ids(trt2)
   first <- FALSE
   continue <- FALSE
+  rowcol = as.logical(rowcol)
   if(design == "RCBD"){
     r <- as.integer(rcbd_r) 
     first <- as.logical(rcbd_first)
@@ -126,6 +128,10 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
   if(design == "BIB"){
     k <- as.integer(bib_k)  
+  }
+  if(design == "CD"){
+    k <- as.integer(cd_k)  
+    r <- as.integer(cd_r)
   }
   
   
@@ -216,10 +222,11 @@ summary.doe <- function(object, ...){
   if(p$design %in% c("GLD", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("Treatment 1 (n):", length(p$trt2), "\n")  
   }
-  if(toupper(p$design) %in% c("RCBD", "CRD", "YOUDEN", "CD", "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+  if(toupper(p$design) %in% c("RCBD", "CRD", "YOUDEN", "CYCLIC", 
+                              "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("r:", p$r, "\n")  
   }
-  if(toupper(p$design) %in% c("BIB","CD", "AD" )){
+  if(toupper(p$design) %in% c("BIB","CYCLIC", "AD" )){
     cat("k:", p$k, "\n")  
   }
   if(toupper(p$design) %in% c("RCBD", "YOUDEN", "SPPD", "F2SPPD" )){
@@ -227,6 +234,9 @@ summary.doe <- function(object, ...){
   }
   if(toupper(p$design) %in% c("RCBD" )){
     cat("Continuous numeration:", p$continue, "\n")  
+  }
+  if(toupper(p$design) %in% c("CYCLIC" )){
+    cat("Row or column:", p$rowcol, "\n")  
   }
   
   cat("randomization algorithm:", p$kind, "\n")

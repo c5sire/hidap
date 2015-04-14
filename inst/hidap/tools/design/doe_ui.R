@@ -141,6 +141,15 @@ output$ui_doe <- renderUI({
       ),
       conditionalPanel(condition =  "input.design == 'BIB' ", 
          selectInput("bib_k", "k:", 4:30, 4)
+      ),
+      conditionalPanel(condition =  "input.design == 'CD' ", 
+         selectInput("cd_r", "r:", 6:30, 6)
+      ),
+      conditionalPanel(condition =  "input.design == 'CD' ", 
+         selectInput("cd_k", "k:", 2:10, 2)
+      ),
+      conditionalPanel(condition =  "input.design == 'CD' ", 
+         checkboxInput("rowcol", "Row or column", FALSE)
       )
       
       
