@@ -61,6 +61,11 @@ guess_k_by_r <- function(n){
     if(length(re)==0) re = NULL
     rs[[r]] <- re
   }
+  if(length(r)==3){
+    names(rs)[1] = paste("n:",n)
+    names(rs)[2] = paste("r:",2)
+    names(rs)[3] = paste("r:",3)
+  }
   rs
 }
 
@@ -77,7 +82,12 @@ get_vk <- function(n, r){
   n = length(n)
   r = as.integer(r)
   x <- guess_k_by_r(n)
-  x[[r]]
+  if(length(x)>0) {
+    return(x[[r]])  
+  } else {
+    return(0)
+  }
+  
 }
 
 #designs = c("RCBD", "CRD", "LSD", "GLD","YD","BIB", "CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD")
@@ -98,11 +108,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 yd_r = 2, yd_first = FALSE,
                 bib_k=4,
                 cd_k = 2, cd_r = 6,
-                ld_r = 9
+                ld_r = 2,
+                ad_r = 2, ad_k = 2
                 ){
   out <- NULL
   
   r <- as.integer(r)
+  k <- as.integer(k)
   trt  <- get_germplasm_ids(trt)
   trt2 <- get_germplasm_ids(trt2)
   first <- FALSE
@@ -137,9 +149,11 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "LD"){
     r <- as.integer(ld_r)
   }
-  
-  
-  k <- as.integer(k)
+  if(design == "AD"){
+    k <- as.integer(ad_k)  
+    r <- as.integer(ad_r)
+  }
+
   zigzag <- as.logical(zigzag)
   rowcol <- as.logical(rowcol)
 #  first <- as.logical(first)
@@ -176,7 +190,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     out <- design_ld(trt, r, serie, seed, kinds)
   }
   if(design == "AD"){
-    out <- design.alpha(trt, k, r, serie, seed, kinds)
+    out <- design_ad(trt, k, r, serie, seed, kinds)
   }
   if(design == "ABD"){
     out <- design.dau(trt, trt2, r, serie, seed, kinds, name)
@@ -227,10 +241,10 @@ summary.doe <- function(object, ...){
     cat("Treatment 1 (n):", length(p$trt2), "\n")  
   }
   if(toupper(p$design) %in% c("RCBD", "CRD", "YOUDEN", "CYCLIC", 
-                              "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+                              "LD", "ALPHA", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("r:", p$r, "\n")  
   }
-  if(toupper(p$design) %in% c("BIB","CYCLIC", "AD" )){
+  if(toupper(p$design) %in% c("BIB","CYCLIC", "ALPHA" )){
     cat("k:", p$k, "\n")  
   }
   if(toupper(p$design) %in% c("RCBD", "YOUDEN", "SPPD", "F2SPPD" )){

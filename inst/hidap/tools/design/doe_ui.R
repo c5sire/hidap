@@ -153,6 +153,12 @@ output$ui_doe <- renderUI({
       ),
       conditionalPanel(condition =  "input.design == 'LD' ", 
          selectInput("ld_r", "r:", 2:3, 2)
+      ),
+      conditionalPanel(condition =  "input.design == 'AD' ", 
+         selectInput("ad_r", "r:", 2:4, 2)
+      ),
+      conditionalPanel(condition =  "input.design == 'AD' ", 
+         selectInput("ad_k", "k:", 2:30, 2)
       )
       
       
