@@ -54,7 +54,7 @@ design_cd <- function(trt, r, k, rowcol, ...){
 design_ld <- function(trt, r, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4) stop("The number of treatments in a LD must be > 3.")
+  if(n < 9) stop("The number of treatments in a lattice design must be > 8.")
   if(r < 2 | r > 3) stop("The value of r must be 2 or 3.")
   if(n %% r != 0) stop("The number of treatments must be a multiple of r.")
   design.lattice(trt, r, ...)

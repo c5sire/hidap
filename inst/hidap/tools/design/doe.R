@@ -97,7 +97,8 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 gld_trt2 = "A",
                 yd_r = 2, yd_first = FALSE,
                 bib_k=4,
-                cd_k = 2, cd_r = 6
+                cd_k = 2, cd_r = 6,
+                ld_r = 9
                 ){
   out <- NULL
   
@@ -132,6 +133,9 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "CD"){
     k <- as.integer(cd_k)  
     r <- as.integer(cd_r)
+  }
+  if(design == "LD"){
+    r <- as.integer(ld_r)
   }
   
   
