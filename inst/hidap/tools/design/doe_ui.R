@@ -130,8 +130,14 @@ output$ui_doe <- renderUI({
        )
       ),
       conditionalPanel(condition =  "input.design == 'GLD' ", 
-         selectInput("trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
+         selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
                                            multiple = FALSE)
+      ),
+      conditionalPanel(condition =  "input.design == 'YD' ", 
+         wellPanel(
+           selectInput("yd_r", "r:", 2:11, 2),
+           checkboxInput("yd_first", "Randomize first block", TRUE)
+         )
       )
       
       

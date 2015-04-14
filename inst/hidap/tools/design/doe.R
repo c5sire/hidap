@@ -93,8 +93,9 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 seed = 0, kinds = "Super-Duper", 
                 
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
-                lsd_r=2, lsd_first = FALSE
-                
+                lsd_r=2, lsd_first = FALSE,
+                gld_trt2 = "A",
+                yd_r = 2, yd_first = FALSE
                 ){
   out <- NULL
   
@@ -115,7 +116,14 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
- 
+  if(design == "GLD"){
+    trt2 <- get_germplasm_ids(gld_trt2)
+  }
+  if(design == "YD"){
+    r <- as.integer(yd_r) 
+    first <- as.logical(yd_first)
+  }
+  
   
   k <- as.integer(k)
   zigzag <- as.logical(zigzag)
@@ -136,7 +144,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
   
   if(design == "LSD"){
-    out <- design_lsd(trt, serie, seed, kinds, first)
+    out <- design_lsd(trt, serie, seed, kinds)
   }
   if(design == "GLD"){
     out <- design_gld(trt, trt2, serie, seed, kinds)
@@ -191,7 +199,7 @@ summary.doe <- function(object, ...){
     p <- x$parameter  
     
   } else {
-    p <- x$parameter
+    p <- x$parameters
   }
   
   names(p)[2] = "trt"
@@ -204,13 +212,13 @@ summary.doe <- function(object, ...){
   if(p$design %in% c("GLD", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("Treatment 1 (n):", length(p$trt2), "\n")  
   }
-  if(toupper(p$design) %in% c("RCBD", "CRD", "YD", "CD", "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+  if(toupper(p$design) %in% c("RCBD", "CRD", "YOUDEN", "CD", "LD", "AD", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("r:", p$r, "\n")  
   }
   if(toupper(p$design) %in% c("BIB","CD", "AD" )){
     cat("k:", p$k, "\n")  
   }
-  if(toupper(p$design) %in% c("RCBD", "YD", "SPPD", "F2SPPD" )){
+  if(toupper(p$design) %in% c("RCBD", "YOUDEN", "SPPD", "F2SPPD" )){
     cat("Randomize first row:", p$first, "\n")  
   }
   if(toupper(p$design) %in% c("RCBD" )){

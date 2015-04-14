@@ -33,7 +33,7 @@ design_yd <- function(trt, r, ...){
   #stopifnot(n > 3 & n < 10)
   if(n < 4 | n > 10) stop("The number of treatments in a YD must be > 3 and < 11.")
   if(r < 2 | r > n) stop("The number of replications in a Youden design must be > 1 and <= number of treatments.")
-  design.youden(trt, r, ...)
+  design.youden(trt, r,  ...)
 }
 
 design_bib <- function(trt, k, ...){
