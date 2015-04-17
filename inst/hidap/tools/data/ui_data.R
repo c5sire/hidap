@@ -2,6 +2,15 @@
 # Shiny interface for data functions
 #######################################
 
+output$data_filter <- renderUI({
+  
+})
+
+output$show_filter <- renderUI({
+  
+})
+
+
 output$ui_filter_error <- renderUI({
   if(is_empty(r_data$filter_error)) return()
   helpText(r_data$filter_error)

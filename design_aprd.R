@@ -15,7 +15,7 @@ design_rcbd <- function(trt, ...){
 design_lsd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 10) stop("The number of treatments in a CRD must be > 3 and < 11.")
+  if(n < 4 | n > 10) stop("The number of treatments in a LSD must be > 3 and < 11.")
   design.lsd(trt, ...)
 }
 
@@ -57,23 +57,20 @@ design_ld <- function(trt, r, ...){
   if(n < 9) stop("The number of treatments in a lattice design must be > 8.")
   if(r < 2 | r > 3) stop("The value of r must be 2 or 3.")
   if(n %% r != 0) stop("The number of treatments must be a multiple of r.")
-  try(
+  out <- try(
     design.lattice(trt, r, ...)  
   )
-  
+  out
 }
 
 design_ad <- function(trt, k, r, ...){
   n <- length(trt)
-  #print("Valid combinations of r and k are: ")
-  #print(guess_k_by_r(n))
+  if(n > 12) stop("The minimum number of treatments in an alpha design should be 12.")
   if(!(r %in% c(2:4))) stop("r must be one of 2, 3, 4.")
-  #if(get_vk(n, r) == 0) stop("Invalid combination.")
-  #if(!(k %in% get_vk(n, r))) stop("Invalid combination.")
-  try(
+  out = try(
     design.alpha(trt, k, r, ...)  
   )
-  
+  out
 }
 
 design_aprd <- function(trt1, trt2, frac = 0.3, r=2, ... 

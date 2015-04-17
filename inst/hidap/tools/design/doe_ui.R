@@ -55,7 +55,40 @@ observe({
    })
 })
 
-
+output$ui_doe <- renderTree({
+  list(
+    Cassava = "",
+    Potato = list(
+      DT = list(Stage1 = list(
+        Trial_1= "",
+        Trial_2 = "",
+        Trial_3 =""
+      ), 
+      LB = list(Stage2 = list(
+        Trial_1 ="",
+        Trial_2 ="",
+        Trial_3=""
+      ))
+      , stselected=TRUE)
+    ),
+    Sweetpotato = list(
+      OF = ""
+    )
+  )
+#     list(
+#       cassava = "",
+#       potato = list(
+#         ProgramA = list(
+#           StageA = list(
+#             Trial1="",
+#             Trial2="",
+#             Trial3=""
+#           ),
+#           StageB = "", leaf3=""),
+#         ProgramB = list(leafA = "", leafB = "")
+#       )
+#    )
+})
 
 output$ui_doe_par <- renderUI({
   choices <- c("Randomized Complete Block Design" = "RCBD",
@@ -68,7 +101,7 @@ output$ui_doe_par <- renderUI({
                "Lattice Design" = "LD",
                "Alpha Design" = "AD",
                "Augmented Block Design" = "ABD",
-               "Augmented Partically Replicated Design" = "APRD",
+               "Augmented Partially Replicated Design" = "APRD",
                "Split-plot Design" = "SPPD",
                "Strip-plot Design" = "STPD",
                "Factorial Design" = "F2SPPD"
@@ -91,9 +124,11 @@ output$ui_doe_par <- renderUI({
 # }
 
 
-output$fieldbook_doe <- renderDataTable(.fieldbook_doe())
+output$fieldbook_doe <- renderDataTable(
+  try(.fieldbook_doe())
+  )
 
-output$ui_doe <- renderUI({
+output$options_doe <- renderUI({
   tagList(
 #     conditionalPanel(condition = "input.tabs_doe == 'Plot'",
 #                      wellPanel(
@@ -124,11 +159,9 @@ output$ui_doe <- renderUI({
         checkboxInput("rcbd_continue", "Use continuous numeration", FALSE) 
        )
       ),
-      conditionalPanel(condition =  "input.design == 'LSD' ", 
-       wellPanel(
-         selectInput("lsd_r", "r:", 2:5, 2)
-       )
-      ),
+#       conditionalPanel(condition =  "input.design == 'LSD' ", 
+#          selectInput("lsd_r", "r:", 2:5, 2)
+#       ),
       conditionalPanel(condition =  "input.design == 'GLD' ", 
          selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
                                            multiple = FALSE)
@@ -161,65 +194,7 @@ output$ui_doe <- renderUI({
          selectInput("ad_k", "k:", 2:30, 2)
       )
       
-      
-#       conditionalPanel(condition = 
-#       " (input.design == 'CRD' |
-#          input.design == 'RCBD' |
-#          input.design == 'YD' )",
-#         
-#           radioButtons("r", "r:", 2:7, 2, inline = TRUE)
-#         
-#       ),
-#       conditionalPanel(condition = 
-#          "input.design == 'AD'",
-#           radioButtons("r", "r:", 2:4, 2, inline = TRUE)
-#       ),
-#       conditionalPanel(condition = 
-#          "input.design == 'LD'",
-#           radioButtons("r", "r:", 2:3, 2, inline = TRUE)
-#       ),
-#       conditionalPanel(condition = 
-#          "input.design == 'CD'",
-#          wellPanel(
-#           radioButtons("r", "r:", c(2,4,6,8), 2, inline = TRUE),
-#           selectInput("k", "k:", 2:10, 2)
-#          )
-#          
-#       ),
-#       
-#       conditionalPanel(condition =
-#         "input.design == 'RCBD' |
-#          input.design == 'LSD' |
-#          input.design == 'YD' ",
-#          checkboxInput("first", "Randomize first row:", FALSE)
-#       ),
-#       conditionalPanel(condition =
-#         "input.design == 'RCBD' ",
-#          checkboxInput("continue", "Continued labeling:", FALSE)
-#       ),
-#       conditionalPanel(condition =
-#         "input.design == 'CD'",
-#         checkboxInput("rowcol", "Row or column:", FALSE)
-#       ),
-#       conditionalPanel(condition =
-#         "input.design == 'BIB' |
-#          input.design == 'AD'
-#         ",
-#          selectInput("k", "k:", 2:10, 3)
-#       ),
-# #       conditionalPanel(condition =
-# #          "input.design == 'AD'",
-# #          #selectInput("k", "k:", guess_k(length(doe_inputs()$trt)))
-# #          selectInput("k", "k:", 2:10, 2)
-# #       ),
-#       
-#       conditionalPanel(condition =
-#          "input.design == 'GLD'",
-#          selectInput("trt2", "Treatment (Germplasm)", get_germplasm_lists() , 
-#                      multiple = FALSE)
-#       )
-    
-      
+     
       
     )
     
@@ -232,41 +207,85 @@ output$ui_doe <- renderUI({
 })
 
 
+output$tabed_doe <- renderRHandsontable({
+  DF <- .getdata()#.fieldbook_doe()
+  #if (!is.null(input$tabed_doe)) {
+  #setHot(DF)
+  rhandsontable(DF) %>%
+    hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
+    hot_cols( fixedColumnsLeft = 3)
+  #}
+})
+
 
 output$doe <- renderUI({
- 
-  register_print_output("summary_doe", ".summary_doe")
-  #register_print_output("fieldbook_doe", ".fieldbook_doe")
-
-#   register_plot_output("plot_my_analysis", ".plot_my_analysis",
-#                        height_fun = "ma_plot_height")
-  # two separate tabs
-  
-  doe_output_panels <- tabsetPanel(
-    id = "tabs_doe",
-    withProgress(message = 'Creating fieldbook', value = 0.1, {
-      tabPanel("Summary", verbatimTextOutput("summary_doe"))
-    })  ,
-    withProgress(message = 'Creating fieldbook', value = 0.1, {  
-      tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
-    })
-    #,
-    #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
+  sidebarLayout(
+    sidebarPanel(
+      shinyTree("ui_doe", checkbox = TRUE)
+    ),
+    
+    # Show a plot of the generated distribution
+    mainPanel(
+      tabsetPanel(
+        id = "tabs_doe",
+        
+        tabPanel("Options", uiOutput("options_doe"))
+        ,
+        withProgress(message = 'Creating fieldbook', value = 0.1, {
+          tabPanel("Summary", verbatimTextOutput("summary_doe"))
+        })  ,
+        withProgress(message = 'Creating fieldbook', value = 0.1, {  
+          tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+        }),
+        tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
+        
+        #,
+        #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
+      )
+    )
+    
   )
-
-  # one output with components stacked
-  # sm_output_panels <- tagList(
-  # tabPanel("Summary", verbatimTextOutput("summary_single_mean")),
-  # tabPanel("Plot", plotOutput("plot_single_mean", height = "100%"))
-  # )
-  stat_tab_panel(menu = "Design",
-                 tool = "Design of experiments",
-                 tool_ui = "ui_doe",
-                 output_panels = doe_output_panels,
-                 data = NULL)
-  # add "data = NULL" if the app doesn't doesn't use data
- 
 })
+
+
+# output$doe <- renderUI({
+#   crop_tree <- shinyTree("ui_doe", checkbox = TRUE)
+#   
+#   register_print_output("summary_doe", ".summary_doe")
+#   #register_print_output("fieldbook_doe", ".fieldbook_doe")
+# 
+# #   register_plot_output("plot_my_analysis", ".plot_my_analysis",
+# #                        height_fun = "ma_plot_height")
+#   # two separate tabs
+#   
+#   doe_output_panels <- tabsetPanel(
+#     id = "tabs_doe",
+#     
+#       tabPanel("Options", uiOutput("options_doe"))
+#       ,
+#     withProgress(message = 'Creating fieldbook', value = 0.1, {
+#       tabPanel("Summary", verbatimTextOutput("summary_doe"))
+#     })  ,
+#     withProgress(message = 'Creating fieldbook', value = 0.1, {  
+#       tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+#     })
+#     #,
+#     #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
+#   )
+#   
+#   # one output with components stacked
+#   # sm_output_panels <- tagList(
+#   # tabPanel("Summary", verbatimTextOutput("summary_single_mean")),
+#   # tabPanel("Plot", plotOutput("plot_single_mean", height = "100%"))
+#   # )
+#   stat_tab_panel(menu = "Design",
+#                  tool = "Design of experiments",
+#                  tool_ui = crop_tree ,
+#                  output_panels = doe_output_panels,
+#                  data = NULL)
+#   # add "data = NULL" if the app doesn't doesn't use data
+#  
+# })
 
 
 

@@ -5,6 +5,10 @@
 # options(shiny.error=recover)
 app_dir <- "hidap"
 
+library(radiant)
+library(shinyTree)
+library(rhandsontable)
+
 pkgs_cran <- c("car", "gridExtra", "GPArotation", "psych", "wordcloud",
                "AlgDesign", "knitr", "lubridate", "ggplot2", "ggdendro",
                "shiny", "pryr", "shiny", "magrittr", "tidyr", "dplyr",

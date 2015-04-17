@@ -47,7 +47,7 @@ valid_k <- function(trt, r = c(2,3,4), k){
 guess_k_by_r <- function(n){
   n = as.integer(n)
   gk <- guess_k(n)
-  
+  if(is.null(gk)) return(NULL)
   rs <- list()
   
   for(r in 2:4){
@@ -61,11 +61,11 @@ guess_k_by_r <- function(n){
     if(length(re)==0) re = NULL
     rs[[r]] <- re
   }
-  if(length(r)==3){
-    names(rs)[1] = paste("n:",n)
-    names(rs)[2] = paste("r:",2)
-    names(rs)[3] = paste("r:",3)
-  }
+#   if(length(r)==3){
+#     names(rs)[1] = paste("n:",n)
+#     names(rs)[2] = paste("r:",2)
+#     names(rs)[3] = paste("r:",3)
+#   }
   rs
 }
 
@@ -129,7 +129,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     r <- as.integer(r)  
   }
   if(design == "LSD"){
-    r <- as.integer(lsd_r) 
+    #r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
   if(design == "GLD"){
@@ -190,7 +190,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     out <- design_ld(trt, r, serie, seed, kinds)
   }
   if(design == "AD"){
-    out <- design_ad(trt, k, r, serie, seed, kinds)
+    #out <- design_ad(trt, k, r, serie, seed, kinds)
   }
   if(design == "ABD"){
     out <- design.dau(trt, trt2, r, serie, seed, kinds, name)
@@ -223,22 +223,24 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 summary.doe <- function(object, ...){
   
   x <- object$res
+  if(length(x) == 0) return("")
   if("parameter" %in% names(x)) {
     p <- x$parameter  
     
   } else {
     p <- x$parameters
   }
+  if(length(p) == 0) return("")
   
-  names(p)[2] = "trt"
+  if(length(p)>=2)  names(p)[2] = "trt"
   
   cat("Summary experimental design\n")
   cat("Design:", p$design, "\n")
   cat("Label series:", p$serie, "\n")
   cat("Zigzag:", p$zigzag, "\n")
   cat("Treatment 1 (n):", length(p$trt), "\n")
-  if(p$design %in% c("GLD", "ABD", "SPPD", "STPD", "F2SPPD" )){
-    cat("Treatment 1 (n):", length(p$trt2), "\n")  
+  if(toupper(p$design) %in% c("GLD", "ABD", "SPPD", "STPD", "F2SPPD" )){
+    cat("Treatment 2 (n):", length(p$trt2), "\n")  
   }
   if(toupper(p$design) %in% c("RCBD", "CRD", "YOUDEN", "CYCLIC", 
                               "LD", "ALPHA", "ABD", "SPPD", "STPD", "F2SPPD" )){

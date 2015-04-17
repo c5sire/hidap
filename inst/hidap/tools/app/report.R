@@ -1,45 +1,152 @@
 ################################################################
 # Create dynamic reports using Radiant and the shinyAce editor
 ################################################################
-rmd_example <- "## Sample report
-
-This is an example of the type of report you can write in Radiant.
-
-* You can create
-* bullet lists
-
-1. And numbered
-2. lists
-
-### Math
-
-You can even include math if you want: $f(\\alpha, \\beta) \\propto x^{\\alpha-1}(1-x)^{\\beta-1}$.
-
-To show the output press the `Update` button.
-
-### Documenting analysis results in Radiant
-
-When you click the book icon on a page the browser will bring you
-to this report page. By default Radiant will paste the code generated
-for the analysis you just completed at the bottom of the report.
-However, you can turn off that feature by clicking the `Manual paste`
-checkbox. The code will then be put in the clipboard when you click a
-book icon and you can paste it where you want in the editor window.
-
-Below is some code created in Radiant will generate regression output
-for the `diamonds` data. There are plots of histograms and a scatterplot
-/ heatmap of the price of diamonds versus carats. The colors in the plot
-reflect the clarity of the diamond.
-
-```{r fig.width=7, fig.height=4}
-result <- regression(dataset = 'diamonds', reg_dep_var = 'price', reg_indep_var = 'carat')
-summary(result)
-plot(result, reg_plots = 'hist')
+rmd_example <- "
+```{r setup,echo=FALSE, results='hide', message=FALSE}
+library(datacheck)
+library(xtable)
+options(xtable.type = 'html')
 ```
 
-```{r fig.width=7, fig.height=7}
-visualize(dataset = 'diamonds', viz_xvar = 'carat', viz_yvar = 'price', viz_type = 'scatter', viz_color = 'clarity')
+A vignette for *datacheck* (version `r pkg_version('datacheck')`)
+========================================================
+Reinhard Simon, International Potato Center, Lima, Peru
+
+The library *datacheck* provides some simple functions to check the consistency of a dataset. It assumes data are available in tabular format - typically a csv file with
+objects or records in rows and attributes or variables in the columns.
+
+In a database setting the variables would be controlled by the database - at least
+conformance to types (character, numeric, etc) and allowed min/maximum values.
+However, often data are gathered in simple spreadsheets or are for other reasons 
+without such constraints. Here, data constraints like allowed types or values, expected
+values and relationships can be defined using R commands and syntax. This allows much
+more flexibility and fine grained control. Typically it demands also a lot of domain
+knowledge from the user. It is therefore often useful to re-use such domain aware rule files across tables with similar content. Therefore this tool is foregiving if rules cannot be executed if a variable is not present in the table to be analyzed allowing the reuse of such rule files.
+
+Using the HTML interface
+-----------------------
+
+
+Use the following commands to copy some example files to your current working directory (uncomment the file.copy command):
+```{r}
+atable = system.file('examples/soilsamples.csv', package='datacheck')
+srules = system.file('examples/soil_rules.R', package='datacheck')
+
+# Uncomment the next two lines
+
+# file.copy(atable, 'soilsamples.csv')
+# file.copy(srules, 'soil_rules.R')
+
 ```
+Then type in the command *run_datacheck()* in the R editor.
+
+Use the upload buttons to load the respective files in your working directory.
+Review the results.
+
+
+Using the command line interface
+--------------------------------
+Assuming you have copied the above mentioned files in your working directory proceed to
+read in the data.
+
+```{r message=FALSE, results='hide'}
+
+
+atable = read.csv(atable, header = TRUE, stringsAsFactors = FALSE)
+srules = read_rules(srules)
+profil = datadict_profile(atable, srules)
+```
+
+You can inspect a graphical summary of rules per variable:
+
+```{r fig.width=7, fig.height=6}
+rule_coverage(profil)
+```
+
+The cumulative number of records with increasing scores.
+```{r fig.width=7, fig.height=6}
+score_sum(profil)
+```
+
+Or see the tables (only the first 20 records and first 6 columns shown):
+
+```{r results = 'asis'}
+xtable(atable[1:20, 1:6])
+```
+
+Similarly for the score table; however, this table contains also the total counts of scores by records and variables. In addition, the maximum score by variable.
+```{r results='asis'}
+ps = profil$scores
+recs = c(1:10, nrow(ps)-1, nrow(ps))
+cols = c(1:4,  ncol(ps))
+xtable(ps[recs, cols])
+```
+
+A last visualization is a heatmap of the score table to organize similar records and similar rule profiles to help detect any patterns,
+
+```{r echo=FALSE, fig.width=7, fig.height=8}
+#filter out only records with less than maximum points
+mp = max(ps$Record.score[nrow(ps)-2])
+
+heatmap_quality(profil, scoreMax = mp)
+
+```
+
+Checking tables with data _inconsistencies_
+--------------------------
+
+For comparative purposes we purposely introduce a few errors in our table as below. We also exclude a rule on soil types for better display.
+```{r message=FALSE, results='hide'}
+atable$P[1]  = -100
+atable$pH[11]= -200
+srule1 = srules[-c(33),]
+profil = datadict_profile(atable, srule1)
+```
+
+To get a better handle on the data it is always informative to review simple descriptive
+summaries of the data. A custom summary function is included in the package to display this summary in tabular form:
+
+```{r results='asis'}
+xtable(short_summary(atable))
+```
+
+A summary of the results by rule can be seen from the profil object:
+
+```{r results = 'asis'}
+xtable(profil$checks)
+```
+
+The *checks* part lists all erroneous records in the last column for each rule. This may be too long for printing. To this end a custom print report function only displays the first n records where n=5 is the default. 
+
+```{r message=FALSE, results = 'hide'}
+atable$Sand[20:30] = -1
+profil = datadict_profile(atable, srule1)
+```
+
+```{r results='asis'}
+
+xtable(prep4rep(profil$checks))
+```
+
+
+Using rules that cannot be executed
+----------------------------------
+This may happen if the syntax is wrong. Another reason - particularly if re-using rule files across tables - maybe that a particular variable name is not present amongst the column names of the present table. The tool will just ignore it and report a 'failed' execution. Let us simply modify an existing rule as below:
+
+```{r message = FALSE, results='hide'}
+srule1$Variable[25] = 'caCO3'
+srule1$Rule[25] = 'caCO3 >= 0'
+profil = datadict_profile(atable, srule1)
+
+```
+
+Now let us just look at an excerpt of the results table:
+
+```{r results = 'asis'}
+xtable(prep4rep(profil$checks[20:30,]))
+```
+
+_End of tutorial_
 "
 
 knitr::opts_chunk$set(echo=FALSE, comment=NA, cache=FALSE, message=FALSE, warning=FALSE,
