@@ -1,5 +1,6 @@
 library("readxl")
 
+
 v <- reactiveValues(msg = "")
 
 locs <- "inst/hidap/tools/dashboard/Master-list-trial-sites.xlsx"
@@ -13,7 +14,7 @@ lat1 <- min(locs$LATD)
 lat2 <- max(locs$LATD)
 
 
-nvar <- abs(round(rnorm(length(LOND))*100, 0)) + 10
+nvar <- abs(round(rnorm(length(locs$LOND))*100, 0)) + 10
 locs <- cbind(locs, nvar)
 
 observeEvent(input$map1_marker_click, {
