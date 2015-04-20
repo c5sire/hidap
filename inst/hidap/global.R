@@ -8,6 +8,9 @@ app_dir <- "hidap"
 library(radiant)
 library(shinyTree)
 library(rhandsontable)
+library(shinydashboard)
+library(leaflet)
+library(lubridate)
 
 pkgs_cran <- c("car", "gridExtra", "GPArotation", "psych", "wordcloud",
                "AlgDesign", "knitr", "lubridate", "ggplot2", "ggdendro",

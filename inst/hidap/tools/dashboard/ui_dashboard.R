@@ -88,7 +88,7 @@ output$map1 <- renderLeaflet({
   m = m %>% fitBounds(lng1,lat1, lng2, lat2)
   m
   
-  m %>% addMarkers(LOND, LATD,popup=locs$FULLN)
+  m %>% addMarkers(locs$LOND, locs$LATD,popup=locs$FULLN)
 })
 
 output$ui_dashboard <- renderUI({
