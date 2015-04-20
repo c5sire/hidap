@@ -207,15 +207,15 @@ output$options_doe <- renderUI({
 })
 
 
-output$tabed_doe <- renderRHandsontable({
-  DF <- .getdata()#.fieldbook_doe()
-  #if (!is.null(input$tabed_doe)) {
-  #setHot(DF)
-  rhandsontable(DF) %>%
-    hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
-    hot_cols( fixedColumnsLeft = 3)
-  #}
-})
+# output$tabed_doe <- renderRHandsontable({
+#   DF <- .getdata()#.fieldbook_doe()
+#   #if (!is.null(input$tabed_doe)) {
+#   #setHot(DF)
+#   rhandsontable(DF) %>%
+#     hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
+#     hot_cols( fixedColumnsLeft = 3)
+#   #}
+# })
 
 
 output$doe <- renderUI({
@@ -231,13 +231,14 @@ output$doe <- renderUI({
         
         tabPanel("Options", uiOutput("options_doe"))
         ,
-        withProgress(message = 'Creating fieldbook', value = 0.1, {
-          tabPanel("Summary", verbatimTextOutput("summary_doe"))
-        })  ,
+#         withProgress(message = 'Creating fieldbook', value = 0.1, {
+#           tabPanel("Summary", verbatimTextOutput("summary_doe"))
+#         })  ,
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
           tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
-        }),
-        tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
+        })
+#         ,
+#         tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
         
         #,
         #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))

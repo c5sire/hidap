@@ -11,6 +11,16 @@ output$show_filter <- renderUI({
 })
 
 
+output$tabed_doe <- renderRHandsontable({
+  DF <- .getdata()#.fieldbook_doe()
+  #if (!is.null(input$tabed_doe)) {
+  #setHot(DF)
+  rhandsontable(DF) %>%
+    hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
+    hot_cols( fixedColumnsLeft = 3)
+  #}
+})
+
 output$ui_filter_error <- renderUI({
   if(is_empty(r_data$filter_error)) return()
   helpText(r_data$filter_error)
@@ -36,9 +46,11 @@ output$ui_data <- renderUI({
         ),
         conditionalPanel("input.datatabs == 'Manage'", uiOutput("ui_Manage")),
         conditionalPanel("input.datatabs == 'View'",uiOutput("ui_View")),
+        #conditionalPanel("input.datatabs == 'Edit'",uiOutput("ui_Edit")),
         conditionalPanel("input.datatabs == 'Visualize'", uiOutput("ui_Visualize")),
         conditionalPanel("input.datatabs == 'Pivot'",uiOutput("ui_Pivot")),
-        conditionalPanel("input.datatabs == 'Explore'", uiOutput("ui_Explore"))),
+        conditionalPanel("input.datatabs == 'Explore'", uiOutput("ui_Explore"))
+      ),
         #conditionalPanel("input.datatabs == 'Transform'", uiOutput("ui_Transform"))),
         #conditionalPanel("input.datatabs == 'Merge'", uiOutput("ui_Merge"))),
       mainPanel(
@@ -55,6 +67,7 @@ output$datatabs <- renderUI({
       conditionalPanel("input.man_add_descr == false", uiOutput("dataDescriptionHTML")),
       conditionalPanel("input.man_add_descr == true", uiOutput("dataDescriptionMD"))),
     tabPanel("View", dataTableOutput("dataviewer")),
+    tabPanel("Edit", rHandsontableOutput("tabed_doe")),
     tabPanel("Visualize",plotOutput("visualize", width = "100%", height = "100%")),
     tabPanel("Pivot", rpivotTable::rpivotTableOutput("pivotData")),
     tabPanel("Explore", verbatimTextOutput("expl_summary"), plotOutput("expl_plots", width = "100%", height = "100%"))#,
