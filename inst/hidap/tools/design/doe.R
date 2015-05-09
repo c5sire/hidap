@@ -275,3 +275,38 @@ fieldbook.doe <- function(object, ...){
 
 
 
+output$doe_full_fieldbook_name <- renderText({
+     .template <- input$doe_template     
+     .date <- input$doe_date
+     .trialSite <- input$doe_trialSite
+    
+    if(is.null(.template))({ return() })
+    if(is.null(.date))({return()})
+    if(is.null(.trialSite))({return()})
+    paste(.template,.date,"_",.trialSite,sep="")
+    
+})
+
+germlist <- reactive({
+  file1 <- input$doe_germ_inputfile
+  if(is.null(file1)){return()}
+  germ_list <- read.csv(file = file1$datapath,header = TRUE)
+  
+})
+
+
+output$doe_germ_table <- renderTable({
+    head(germlist(),n = 4)
+})
+
+
+# output$doe_germ_table <- renderText({
+#       
+# #      file <- input$doe_germ_inputfile
+# #      p <- file$datapath
+# #      if(is.null(file)){return()}
+# # #      readxl::read_excel(path = file$datapath,1,col_names = TRUE)
+# #      paste(p)   
+# })
+
+

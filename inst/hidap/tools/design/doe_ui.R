@@ -2,7 +2,7 @@
 
 doe_args <- as.list(formals(doe))
 #cat("hi")
-#print(doe_args)
+print(doe_args)
 
 doe_inputs <- reactive({
   # loop needed because reactive values don't allow single bracket indexing
@@ -60,9 +60,9 @@ output$ui_doe <- renderTree({
     Cassava = "",
     Potato = list(
       DT = list(Stage1 = list(
-        Trial_1= "",
+        Trial_1 = "",
         Trial_2 = "",
-        Trial_3 =""
+        Trial_3 = ""
       ), 
       LB = list(Stage2 = list(
         Trial_1 ="",
@@ -129,6 +129,7 @@ output$fieldbook_doe <- renderDataTable(
   )
 
 output$options_doe <- renderUI({
+ #BEGIN tagList
   tagList(
 #     conditionalPanel(condition = "input.tabs_doe == 'Plot'",
 #                      wellPanel(
@@ -140,7 +141,51 @@ output$options_doe <- renderUI({
 #                      )
 #     ),
     wellPanel(
-      uiOutput("ui_doe_par"),
+      
+      selectInput(inputId = "doe_template",label = "Template",choices = c("PTYL"),
+                  selected = c("PTLY"),multiple = FALSE),
+      
+      dateInput('doe_date',
+                label = 'Date input: yyyy-mm-dd',startview = "year",
+                value = Sys.Date()
+      ),
+  
+      selectInput(inputId = "doe_trialSite",label = "Trial Site", choices = c("CIPHQ"),selected = c("CIPHQ"),multiple = FALSE),
+      
+      h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
+        color: #4d3a7d;"),
+      verbatimTextOutput(outputId = "doe_full_fieldbook_name")
+    
+    ), 
+    
+    
+    wellPanel(
+      h4("Define Genotypes",style = "font-family: 'Arial', cursive;
+        font-weight: 500; line-height: 1.1; 
+        color: #4d3a7d;"),
+      br(),
+      
+      fluidRow(
+        column(3,
+             tags$textarea(id="doe_germ_txtarea", rows="8", style="width:300px;", "")),
+      br(),
+     
+        column(6,offset = 2,
+            fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
+            #tableOutput("doe_germ_table")
+            tableOutput("doe_germ_table")
+            
+            )
+       
+      )
+      
+      
+      ),
+    
+    
+    wellPanel(
+      uiOutput("ui_doe_par"), ##SELECT THE STATISTICAL DESIGN
+      
       checkboxInput("zigzag", "Zigzag:", TRUE),
       radioButtons("serie", "Label series:", 
                    #get_series_labels(), "101, 102, ...", #get_series_labels()[[2]], 
@@ -193,9 +238,7 @@ output$options_doe <- renderUI({
       conditionalPanel(condition =  "input.design == 'AD' ", 
          selectInput("ad_k", "k:", 2:30, 2)
       )
-      
-     
-      
+       
     )
     
       #     ,
@@ -203,7 +246,21 @@ output$options_doe <- renderUI({
 #                     help_file = inclMD(file.path("..",app_dir,"tools","help",
 #                                                  "my_analysis.md"))
 #     )
+#END tagList
   )
+})
+
+
+output$fb_variables_doe <- renderUI({
+  tagList(
+    wellPanel(
+      checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
+                    choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = 2, "Choice 3" = 3),
+                    selected = 1)
+      )
+  )
+  
+  
 })
 
 
@@ -236,12 +293,16 @@ output$doe <- renderUI({
 #         })  ,
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
           tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+          
         })
-#         ,
+         ,
 #         tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
         
         #,
         #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
+       tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"))
+
+
       )
     )
     
