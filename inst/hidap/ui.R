@@ -14,7 +14,7 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
              tabPanel("GWAS", uiOutput("ui_gwas"))
              
   ),
-
+  
   navbarMenu("R",
     tabPanel("Report", uiOutput("report")),
     tabPanel("Code", uiOutput("rcode"))

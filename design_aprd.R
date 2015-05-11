@@ -8,7 +8,7 @@ design_crd <- function(trt, ...){
 design_rcbd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 30) stop("The number of treatments in a CRD must be > 3 and < 31.")
+  if(n < 4 | n > 30) stop("The number of treatments in a RCBD must be > 3 and < 31.")
   design.rcbd(trt, ...)
 }
 

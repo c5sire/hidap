@@ -157,7 +157,6 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   zigzag <- as.logical(zigzag)
   rowcol <- as.logical(rowcol)
 #  first <- as.logical(first)
-
   
   #print(serie)
   serie <- as.integer(serie)
@@ -216,7 +215,19 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
   out -> res
   
+#   print("res")
+#   print(res)
+#   save(res,file = "res.Rdata")
+#   print("out")
+#   print(out)
+#   save(out,file = "out.Rdata")
+
   environment() %>% as.list %>% set_class(c("doe",class(.)))
+
+#   print("el doe")
+#   t <- environment() %>% as.list %>% set_class(c("doe",class(.)))
+#   save(t,file = "doe.Rdata")
+
 }
 
 
@@ -267,13 +278,14 @@ summary.doe <- function(object, ...){
 
 
 fieldbook.doe <- function(object, ...){
-  
+   
   x <- object$res
   
   x$book
 }
 
 
+#####################Added by Omar Benites
 
 output$doe_full_fieldbook_name <- renderText({
      .template <- input$doe_template     
@@ -294,11 +306,9 @@ germlist <- reactive({
   
 })
 
-
 output$doe_germ_table <- renderTable({
     head(germlist(),n = 4)
 })
-
 
 # output$doe_germ_table <- renderText({
 #       

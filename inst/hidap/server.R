@@ -5,7 +5,9 @@ shinyServer(function(input, output, session) {
   # source shared functions
 	source('init.R', local = TRUE)
 	source('radiant.R', local = TRUE)
-
+  source('renderInfoBox.R',local=TRUE) #added by Omar Benites
+  source('data_dictionary.R',local=TRUE)
+  
 	# for shiny-server
  	if(!"package:radiant" %in% search()) {
 	  for(file in list.files("../../R",
@@ -24,8 +26,6 @@ shinyServer(function(input, output, session) {
 
   	source(file, local = TRUE)
   }
-  
-
 
   # save state on refresh or browser close
   saveStateOnRefresh(session)

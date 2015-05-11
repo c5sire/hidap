@@ -2,7 +2,9 @@
 
 doe_args <- as.list(formals(doe))
 #cat("hi")
-print(doe_args)
+#print("doe_args")
+# print(doe_args)#los parametros pasados para el libro de campo
+save(doe_args,file = "doe.args.Rdata")
 
 doe_inputs <- reactive({
   # loop needed because reactive values don't allow single bracket indexing
@@ -11,6 +13,7 @@ doe_inputs <- reactive({
   }
   #print(doe_args)
   #if(!input$show_filter) doe_args$data_filter = ""
+  #print second doe_args de doe_inputs
   #print(doe_args)
   doe_args
 })
@@ -29,6 +32,7 @@ doe_inputs <- reactive({
   out
 })
 
+#.doe :: la funcion doe usa como argumento doe_inputs()
 .doe <- reactive({
   do.call(doe, doe_inputs())
   
@@ -54,6 +58,10 @@ observe({
                   fig.height = round(7 * doe_plot_height()/650,2))
    })
 })
+
+var_list <- as.list(data_dictionary(fp))
+
+###VISUAL INTERFACE
 
 output$ui_doe <- renderTree({
   list(
@@ -142,20 +150,23 @@ output$options_doe <- renderUI({
 #     ),
     wellPanel(
       
-      selectInput(inputId = "doe_template",label = "Template",choices = c("PTYL"),
-                  selected = c("PTLY"),multiple = FALSE),
+      selectInput(inputId = "doe_type_crop", label = "Type of Crop", choices = c("Potato","Sweetpotato"),
+                  selected = c("Potato"), multiple = FALSE ),
+      
+      selectInput(inputId = "doe_template",label = "Type of Trial (Template)",choices = c("PTYL","SPYL"),
+                  selected = c("PTLY"), multiple = FALSE),
       
       dateInput('doe_date',
                 label = 'Date input: yyyy-mm-dd',startview = "year",
                 value = Sys.Date()
       ),
   
-      selectInput(inputId = "doe_trialSite",label = "Trial Site", choices = c("CIPHQ"),selected = c("CIPHQ"),multiple = FALSE),
+      selectInput(inputId = "doe_trialSite",label = "Trial Site", choices = c("CIPHQ","NAROK"),selected = c("CIPHQ"),multiple = FALSE),
       
       h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
       verbatimTextOutput(outputId = "doe_full_fieldbook_name")
-    
+      
     ), 
     
     
@@ -253,11 +264,37 @@ output$options_doe <- renderUI({
 
 output$fb_variables_doe <- renderUI({
   tagList(
-    wellPanel(
-      checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
-                    choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = 2, "Choice 3" = 3),
-                    selected = 1)
+    
+    radioButtons("crop_type",label = NULL,
+                 choices = list("Potato","Sweetpotato") 
+                 
+    ),      
+     
+    conditionalPanel(#begin conditional panel
+      condition = "input.crop_type=='Potato'",
+    
+         wellPanel(style = "background-color: #99CC99;",
+           checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
+                    #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
+                    choices = var_list,
+                    selected = var_list[1])
+              )
+    ), #end conditional panel
+    
+    conditionalPanel(
+      condition = "input.crop_type=='Sweetpotato'",
+          wellPanel(style = "background-color: #99CC99;",
+            checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
+                               choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
+                               selected = 3)
       )
+      
+      
+      )
+    
+    
+    
+    
   )
   
   
