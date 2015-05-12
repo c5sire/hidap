@@ -276,12 +276,59 @@ summary.doe <- function(object, ...){
   #print(x$book)
 }
 
+var_selected <- reactive({
+  
+  if(input$crop_type=='Potato'){
+  vars <- input$vars_doe_pt 
+  vars <- as.character(as.vector(vars))
+  vars
+  }
+  if(input$crop_type=="Sweetpotato"){
+  vars <- input$vars_doe_sp  
+  vars <- as.character(as.vector(vars))
+  }
+  vars
+})
+
 
 fieldbook.doe <- function(object, ...){
    
-  x <- object$res
+  x <- object$res #assigng all the features of the fieldbook
   
-  x$book
+  fieldbook <- x$book #extract the fieldbook design
+  
+#   if(is.null(var_selected())){
+#     fieldbook
+#   }else{
+#     var_names <- var_selected() 
+#     fieldbook[,vars_names] <- NA
+#     fieldbook
+#   }
+  if(is.null(var_selected())){
+    fieldbook
+  }else{
+    fieldbook[,var_selected()] <- NA 
+    fieldbook 
+  } 
+#   l <- nrow(x$book) 
+#   TTWP <- rep(46,times = l)
+#   TNTP <- rep(15,times=l)
+#   ATW <- rep(15,times=l)
+#   DM1 <- rep(15,times=l)
+#   AVDM <- rep(23,times = l)
+#   AOCP <- rep(46,times = l)
+#   FE1 <- rep(15,times=l)
+#   FE2 <- rep(15,times=l)
+#   FE3 <- rep(15,times=l)
+#   CAR4 <- rep(23,times = l)
+#   CAR5 <- rep(46,times = l)
+#   CAR6 <- rep(23,times = l)
+#   CAR7 <- rep(46,times = l)
+#   CAR8 <- rep(23,times = l)
+#   CAR9 <- rep(46,times = l)
+#   
+#   cos <-data.frame(x$book, TTWP,TNTP,ATW,DM1,AVDM,AOCP,FE1,FE2,FE3,CAR4,CAR5,CAR6,CAR7,CAR8,CAR9) 
+#   cos
 }
 
 
@@ -309,6 +356,11 @@ germlist <- reactive({
 output$doe_germ_table <- renderTable({
     head(germlist(),n = 4)
 })
+
+
+
+
+
 
 # output$doe_germ_table <- renderText({
 #       

@@ -29,6 +29,7 @@ doe_inputs <- reactive({
 
 .fieldbook_doe <- reactive({
   out <- fieldbook.doe(.doe())
+  
   out
 })
 
@@ -133,7 +134,8 @@ output$ui_doe_par <- renderUI({
 
 
 output$fieldbook_doe <- renderDataTable(
-  try(.fieldbook_doe())
+  
+   try(.fieldbook_doe())
   )
 
 output$options_doe <- renderUI({
@@ -178,7 +180,7 @@ output$options_doe <- renderUI({
       
       fluidRow(
         column(3,
-             tags$textarea(id="doe_germ_txtarea", rows="8", style="width:300px;", "")),
+             tags$textarea(id="doe_germ_txtarea", rows="10", style="width:300px;", "")),
       br(),
      
         column(6,offset = 2,
@@ -274,28 +276,22 @@ output$fb_variables_doe <- renderUI({
       condition = "input.crop_type=='Potato'",
     
          wellPanel(style = "background-color: #99CC99;",
-           checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
+           checkboxGroupInput("vars_doe_pt",label = "Fiedlbook Variables" ,
                     #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
                     choices = var_list,
-                    selected = var_list[1])
+                    selected = "") #var_list[1]
               )
     ), #end conditional panel
     
     conditionalPanel(
       condition = "input.crop_type=='Sweetpotato'",
           wellPanel(style = "background-color: #99CC99;",
-            checkboxGroupInput("vars_doe",label = "Fiedlbook Variables" ,
+            checkboxGroupInput("vars_doe_sp",label = "Fiedlbook Variables" ,
                                choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
-                               selected = 3)
-      )
-      
-      
-      )
-    
-    
-    
-    
+                               selected = "")
+    )
   )
+)
   
   
 })
@@ -328,16 +324,18 @@ output$doe <- renderUI({
 #         withProgress(message = 'Creating fieldbook', value = 0.1, {
 #           tabPanel("Summary", verbatimTextOutput("summary_doe"))
 #         })  ,
+
+        tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe")), 
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
           tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
           
         })
-         ,
+         
 #         tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
         
         #,
         #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
-       tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"))
+     
 
 
       )
