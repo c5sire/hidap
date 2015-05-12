@@ -10,7 +10,7 @@ get_germplasm_lists <- function(){
 
 get_germplasm_ids <- function(gp_list_id){
   # mockup : should get from database
-  x = 5
+  x = 21
   if(str_detect(gp_list_id[1],"B")) x = 10
   if(str_detect(gp_list_id[1],"C")) x = 20
   

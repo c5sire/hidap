@@ -1,22 +1,29 @@
 design_crd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 9) stop("The number of treatments in a CRD must be > 3 and < 10.")
+  if(n < 3 | n > 1000000) stop("The number of treatments in a CRD must be > 3 and < 10.")
   design.crd(trt, ...)
 }
 
 design_rcbd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 30) stop("The number of treatments in a RCBD must be > 3 and < 31.")
+  if(n < 3 | n > 10000000) stop("The number of treatments in a RCBD must be > 3 and < 31.")
   design.rcbd(trt, ...)
 }
 
 design_lsd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 10) stop("The number of treatments in a LSD must be > 3 and < 11.")
+  if(n < 3 | n > 100000000) stop("The number of treatments in a LSD must be > 3 and < 11.")
   design.lsd(trt, ...)
+}
+
+design_abd <- function(trt,trt2,...){
+  #en augmented block design trt:: checks & trt2::genotypes
+  n = length(trt2)
+  if(n < 3 | n > 100000000) stop("The number of treatments in Augmented Block design must be >3.")
+  design.dau(trt,trt2, ...)
 }
 
 design_gld <- function(trt, trt2, ...){
@@ -31,7 +38,7 @@ design_gld <- function(trt, trt2, ...){
 design_yd <- function(trt, r, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 10) stop("The number of treatments in a YD must be > 3 and < 11.")
+  if(n < 3 | n > 1000000) stop("The number of treatments in a YD must be > 3 and < 11.")
   if(r < 2 | r > n) stop("The number of replications in a Youden design must be > 1 and <= number of treatments.")
   design.youden(trt, r,  ...)
 }
@@ -73,17 +80,17 @@ design_ad <- function(trt, k, r, ...){
   out
 }
 
-design_aprd <- function(trt1, trt2, frac = 0.3, r=2, ... 
-                        ){
-  stopifnot(is.numeric(frac))
-  stopifnot(frac>=0 & frac < 1)
-  # checks are in trt1
-  # new varieties in trt2
-  size <- max(0, trunc(length(trt2) * frac))
-  t2 <- sample(trt2, size)
-  trt1 <- c(trt1, t2)
-  trt2 <- trt2[!trt2 %in% t2]
-  
-  design.dau(trt1, trt2, r=r, ...)
-}
+# design_aprd <- function(trt1, trt2, frac = 0.3, r=2, ... 
+#                         ){
+#   stopifnot(is.numeric(frac))
+#   stopifnot(frac>=0 & frac < 1)
+#   # checks are in trt1
+#   # new varieties in trt2
+#   size <- max(0, trunc(length(trt2) * frac))
+#   t2 <- sample(trt2, size)
+#   trt1 <- c(trt1, t2)
+#   trt2 <- trt2[!trt2 %in% t2]
+#   
+#   design.dau(trt1, trt2, r=r, ...)
+# }
 

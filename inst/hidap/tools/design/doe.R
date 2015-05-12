@@ -94,7 +94,8 @@ get_vk <- function(n, r){
 
 doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB", 
                            #"CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD"), 
-                trt = "A", trt2 = letters[1:8],
+                #trt = "A", trt2 = letters[1:8],
+                trt = "A" ,trt2 = letters[1:8],
                 r = 2, k = 2,
                 rowcol = FALSE,
                 name = "", 
@@ -102,9 +103,19 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 serie = 1, zigzag = TRUE,
                 seed = 0, kinds = "Super-Duper", 
                 
+                crd_r=2 , crd_first = FALSE, crd_continue = FALSE,
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
+                                    
                 lsd_r=2, lsd_first = FALSE,
+                abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
+                #abd_r=2, #abd_first =FALSE
+                
                 gld_trt2 = "A",
+                
+                sppd_r=2, sppd_first=FALSE, sppd_continue=FALSE, 
+                sppd_stat_design="rcbd",sppd_factor_lvl1="level1",sppd_factor_lvl2="level2",sppd_factor_lvl3="level3",
+                
+                
                 yd_r = 2, yd_first = FALSE,
                 bib_k=4,
                 cd_k = 2, cd_r = 6,
@@ -115,23 +126,53 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   
   r <- as.integer(r)
   k <- as.integer(k)
-  trt  <- get_germplasm_ids(trt)
-  trt2 <- get_germplasm_ids(trt2)
+  #trt  <- get_germplasm_ids(trt)
+  trt <- germlist()
+  #trt2 <- get_germplasm_ids(trt2)
+  trt2 <- genochecks()
   first <- FALSE
   continue <- FALSE
   rowcol = as.logical(rowcol)
+  
   if(design == "RCBD"){
     r <- as.integer(rcbd_r) 
     first <- as.logical(rcbd_first)
     continue <- as.logical(rcbd_continue)
   }
   if(design == "CRD"){
-    r <- as.integer(r)  
+    r <- as.integer(crd_r)
+    first <- as.logical(crd_first)
+    continue <- as.logical(crd_continue)
   }
   if(design == "LSD"){
     #r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
+  
+  if(design == "ABD"){
+#     trt <- trt2
+#     trt2 <- trt
+    r <- as.integer(abd_r)
+    #trt2 <- get_germplasm_ids(abd_trt2)
+    first <- as.logical(abd_first)
+    continue <- as.logical(abd_continue)
+  }
+  
+  if(design == "SPPD"){
+    r <- as.integer(sppd_r)
+    first <- as.logical(sppd_first)
+    continue <- as.logical(sppd_continue) 
+    
+    sub_design <- as.character(sppd_stat_design)
+    sppd_factor_lvl1 <- sppd_factor_lvl1 %>% as.character() %>% str_trim(.,side = "both")
+    sppd_factor_lvl2 <- sppd_factor_lvl2 %>% as.character() %>% str_trim(.,side = "both")
+    sppd_factor_lvl3 <- sppd_factor_lvl3 %>% as.character() %>% str_trim(.,side = "both")
+    trt2 <- c(sppd_factor_lvl1,sppd_factor_lvl2,sppd_factor_lvl3)
+    
+  }
+
+
+
   if(design == "GLD"){
     trt2 <- get_germplasm_ids(gld_trt2)
   }
@@ -173,36 +214,50 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "LSD"){
     out <- design_lsd(trt, serie, seed, kinds)
   }
+
+  if(design == "ABD"){ #trt2::genotypes & trt:: genotypes
+    out <- design_abd(trt2,trt, r, serie, seed, kinds)
+  }
+  
   if(design == "GLD"){
     out <- design_gld(trt, trt2, serie, seed, kinds)
   }
-  if(design == "YD"){
-    out <- design_yd(trt, r, serie, seed, kinds, first)
-  }
-  if(design == "BIB"){
-    out <- design_bib(trt, k, serie, seed, kinds)
-  }
-  if(design == "CD"){
-    out <- design_cd(trt, r, k, rowcol, serie, seed, kinds)
-  }
-  if(design == "LD"){
-    out <- design_ld(trt, r, serie, seed, kinds)
-  }
-  if(design == "AD"){
-    #out <- design_ad(trt, k, r, serie, seed, kinds)
-  }
-  if(design == "ABD"){
-    out <- design.dau(trt, trt2, r, serie, seed, kinds, name)
-  }
+
   if(design == "SPPD"){
     out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds, first)
   }
+
+  if(design == "YD"){
+    out <- design_yd(trt, r, serie, seed, kinds, first)
+  }
+
+  if(design == "BIB"){
+    out <- design_bib(trt, k, serie, seed, kinds)
+  }
+
+  if(design == "CD"){
+    out <- design_cd(trt, r, k, rowcol, serie, seed, kinds)
+  }
+
+  if(design == "LD"){
+    out <- design_ld(trt, r, serie, seed, kinds)
+  }
+
+  if(design == "AD"){
+    out <- design_ad(trt, k, r, serie, seed, kinds)
+  }
+#   if(design == "ABD"){
+#     out <- design.dau(trt2, trt, r, serie, seed, kinds, name)
+#   }
+
   if(design == "STPD"){
     out <- design.strip(trt, trt2, r, serie, seed, kinds)
   }
+  
   if(design == "AB"){
     out <- design.ab(trt, r, serie, sub_design, seed, kinds, first)
   }
+
   if(design == "APRD"){
     out <- design_aprd(trt, trt2, frac, r, serie, seed, kinds)
   }
@@ -346,18 +401,39 @@ output$doe_full_fieldbook_name <- renderText({
     
 })
 
+#list of the genotypes on the fieldbook
 germlist <- reactive({
+  
+  
   file1 <- input$doe_germ_inputfile
   if(is.null(file1)){return()}
-  germ_list <- read.csv(file = file1$datapath,header = TRUE)
+  germ_list <- read.csv(file = file1$datapath,header = TRUE)[["INSTN"]] %>% as.character()
   
 })
 
+#begin genotypes that we use as checks in the field
+genochecks <- reactive({
+  file2 <- input$abd_check_inputfile
+  if(is.null(file2)){return()}
+  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+})
+#end genochecks
+
+
 output$doe_germ_table <- renderTable({
-    head(germlist(),n = 4)
+  pol <- as.data.frame(germlist())  
+  #head(germlist(),n = 4)
+  head(pol,n=4)
 })
 
 
+output$doe_genochecks_table <- renderTable({
+  pol <- as.data.frame(genochecks())  
+  #head(germlist(),n = 4)
+  head(pol,n=4)
+  
+  
+})
 
 
 
@@ -370,5 +446,18 @@ output$doe_germ_table <- renderTable({
 # # #      readxl::read_excel(path = file$datapath,1,col_names = TRUE)
 # #      paste(p)   
 # })
+
+##################DownloadData ()
+
+
+output$downloadData <- downloadHandler(
+  filename = function() { paste("fbelisa", '.csv', sep='') },
+  content = function(file) {
+    write.csv(.fieldbook_doe(), file, na="",row.names=FALSE,col.names=FALSE)
+  }
+)
+
+
+
 
 
