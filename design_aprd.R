@@ -1,22 +1,28 @@
 design_crd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 9) stop("The number of treatments in a CRD must be > 3 and < 10.")
+  if(n < 3 | n > 1000000) stop("The number of treatments in a CRD must be > 3 and < 10.")
   design.crd(trt, ...)
 }
 
 design_rcbd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 30) stop("The number of treatments in a RCBD must be > 3 and < 31.")
+  if(n < 3 | n > 10000000) stop("The number of treatments in a RCBD must be > 3 and < 31.")
   design.rcbd(trt, ...)
 }
 
 design_lsd <- function(trt, ...){
   n = length(trt)
   #stopifnot(n > 3 & n < 10)
-  if(n < 4 | n > 10) stop("The number of treatments in a LSD must be > 3 and < 11.")
+  if(n < 3 | n > 100000000) stop("The number of treatments in a LSD must be > 3 and < 11.")
   design.lsd(trt, ...)
+}
+
+design_abd <- function(trt,trt2,...){
+  n=length(trt)
+  if(n < 3 | n > 100000000) strop("The number of treatments in Augmented Block design must be >3 and < 11.")
+  design.dau(trt,trt2, ...)
 }
 
 design_gld <- function(trt, trt2, ...){

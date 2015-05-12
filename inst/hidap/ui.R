@@ -19,14 +19,14 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
     tabPanel("Report", uiOutput("report")),
     tabPanel("Code", uiOutput("rcode"))
   ),
-
+  
   tabPanel("Quit", uiOutput("savequit")),
-
+  
   navbarMenu("Help",
     tabPanel(paste(app_title, "help"), uiOutput("help_base")),
     tabPanel(paste(app_title, "videos"), uiOutput("help_videos")),
     tabPanel("About", uiOutput("help_about"))
   ),
-
+  
   tags$head(tags$link(rel="shortcut icon", href="imgs/icon.png"))
 ))

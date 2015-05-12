@@ -167,8 +167,7 @@ output$options_doe <- renderUI({
       
       h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
-      verbatimTextOutput(outputId = "doe_full_fieldbook_name")
-      
+      verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
     ), 
     
     
@@ -182,14 +181,13 @@ output$options_doe <- renderUI({
         column(3,
              tags$textarea(id="doe_germ_txtarea", rows="10", style="width:300px;", "")),
       br(),
-     
+      
         column(6,offset = 2,
             fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
             #tableOutput("doe_germ_table")
             tableOutput("doe_germ_table")
             
             )
-       
       )
       
       
@@ -204,53 +202,87 @@ output$options_doe <- renderUI({
                    #get_series_labels(), "101, 102, ...", #get_series_labels()[[2]], 
                    1:3, 2, 
                    inline = TRUE),
-      selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
-                    multiple = FALSE),
-      conditionalPanel(condition = 
-        "input.design == 'CRD'",
-        radioButtons("r", "r:", 2:4, 2, inline = TRUE)
+#       selectInput("trt", "Treatment (Germplasm)", get_germplasm_lists() , 
+#                     multiple = FALSE),
+      conditionalPanel(condition =  "input.design == 'CRD'",
+        #radioButtons("r", "r:", 2:9, 2, inline = TRUE)
+        wellPanel(
+          selectInput("crd_r", "r:", 2:1000, 3),
+          checkboxInput("crd_first", "Randomize first block", FALSE), 
+          checkboxInput("crd_continue", "Use continuous numeration", FALSE) 
+        )
+        
       ),
       conditionalPanel(condition =  "input.design == 'RCBD' ", 
         wellPanel(
-        selectInput("rcbd_r", "r:", 2:10, 2),
+        selectInput("rcbd_r", "r:", 2:1000, 3),
         checkboxInput("rcbd_first", "Randomize first block", FALSE), 
         checkboxInput("rcbd_continue", "Use continuous numeration", FALSE) 
        )
       ),
-#       conditionalPanel(condition =  "input.design == 'LSD' ", 
-#          selectInput("lsd_r", "r:", 2:5, 2)
-#       ),
+
+      conditionalPanel(condition =  "input.design == 'LSD' ",
+        wellPanel(                        
+         selectInput("lsd_r", "r:", 2:1000, 3),
+         checkboxInput("lsd_first", "Randomize first block", FALSE) 
+        )
+      ),
+      
+        conditionalPanel(condition =  "input.design == 'ABD' ", 
+                         wellPanel(
+                           selectInput("abd_r", "r:", 2:1000, 3),
+                           checkboxInput("abd_first", "Randomize first block", FALSE), 
+                           checkboxInput("abd_continue", "Use continuous numeration", FALSE),
+                           br(),
+                                                      
+                           fluidRow(
+                             column(3,
+                                    tags$textarea(id="abd_check_txtarea", rows="10", style="width:300px;", "")),
+                             br(),
+                             
+                             column(6,offset = 2,
+                                    fileInput(inputId = "abd_check_inputfile",label = "Check-Genotipes List")
+                                    #tableOutput("doe_germ_table") 
+                                    #tableOutput("doe_germ_table")                                
+                             )
+                           )                      
+                         )
+        ),
+
       conditionalPanel(condition =  "input.design == 'GLD' ", 
          selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
                                            multiple = FALSE)
-      ),
-      conditionalPanel(condition =  "input.design == 'YD' ", 
-         wellPanel(
-           selectInput("yd_r", "r:", 2:11, 2),
-           checkboxInput("yd_first", "Randomize first block", TRUE)
-         )
-      ),
-      conditionalPanel(condition =  "input.design == 'BIB' ", 
-         selectInput("bib_k", "k:", 4:30, 4)
-      ),
-      conditionalPanel(condition =  "input.design == 'CD' ", 
-         selectInput("cd_r", "r:", 6:30, 6)
-      ),
-      conditionalPanel(condition =  "input.design == 'CD' ", 
-         selectInput("cd_k", "k:", 2:10, 2)
-      ),
-      conditionalPanel(condition =  "input.design == 'CD' ", 
-         checkboxInput("rowcol", "Row or column", FALSE)
-      ),
-      conditionalPanel(condition =  "input.design == 'LD' ", 
-         selectInput("ld_r", "r:", 2:3, 2)
-      ),
-      conditionalPanel(condition =  "input.design == 'AD' ", 
-         selectInput("ad_r", "r:", 2:4, 2)
-      ),
-      conditionalPanel(condition =  "input.design == 'AD' ", 
-         selectInput("ad_k", "k:", 2:30, 2)
       )
+      
+      
+        
+#       conditionalPanel(condition =  "input.design == 'YD' ", 
+#          wellPanel(
+#            selectInput("yd_r", "r:", 2:11, 2),
+#            checkboxInput("yd_first", "Randomize first block", TRUE)
+#          )
+#       ),
+#       conditionalPanel(condition =  "input.design == 'BIB' ", 
+#          selectInput("bib_k", "k:", 4:30, 4)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'CD' ", 
+#          selectInput("cd_r", "r:", 6:30, 6)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'CD' ", 
+#          selectInput("cd_k", "k:", 2:10, 2)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'CD' ", 
+#          checkboxInput("rowcol", "Row or column", FALSE)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'LD' ", 
+#          selectInput("ld_r", "r:", 2:3, 2)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'AD' ", 
+#          selectInput("ad_r", "r:", 2:4, 2)
+#       ),
+#       conditionalPanel(condition =  "input.design == 'AD' ", 
+#          selectInput("ad_k", "k:", 2:30, 2)
+#       )
        
     )
     
@@ -319,15 +351,15 @@ output$doe <- renderUI({
       tabsetPanel(
         id = "tabs_doe",
         
-        tabPanel("Options", uiOutput("options_doe"))
+        tabPanel("Options", uiOutput("options_doe"),icon = icon("fa fa-file-excel-o fa-2x"))
         ,
 #         withProgress(message = 'Creating fieldbook', value = 0.1, {
 #           tabPanel("Summary", verbatimTextOutput("summary_doe"))
 #         })  ,
-
-        tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe")), 
+         
+        tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"),icon = icon("fa fa-building-o fa-2x")), 
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
-          tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"))
+        tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
           
         })
          

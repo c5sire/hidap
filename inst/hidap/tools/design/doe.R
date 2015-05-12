@@ -94,7 +94,8 @@ get_vk <- function(n, r){
 
 doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB", 
                            #"CD","LD","AD","ABD", "SPPD", "STPD", "F2SPPD"), 
-                trt = "A", trt2 = letters[1:8],
+                #trt = "A", trt2 = letters[1:8],
+                trt = "A" ,trt2 = letters[1:8],
                 r = 2, k = 2,
                 rowcol = FALSE,
                 name = "", 
@@ -102,8 +103,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 serie = 1, zigzag = TRUE,
                 seed = 0, kinds = "Super-Duper", 
                 
+                crd_r=2 , crd_first = FALSE, crd_continue = FALSE,
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
+                                    
                 lsd_r=2, lsd_first = FALSE,
+                abd_trt2= "A", abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
+                
+                
                 gld_trt2 = "A",
                 yd_r = 2, yd_first = FALSE,
                 bib_k=4,
@@ -115,23 +121,36 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   
   r <- as.integer(r)
   k <- as.integer(k)
-  trt  <- get_germplasm_ids(trt)
-  trt2 <- get_germplasm_ids(trt2)
+  #trt  <- get_germplasm_ids(trt)
+  trt <- germlist()
+  #trt2 <- get_germplasm_ids(trt2)
+  trt2 <- genochecks()
   first <- FALSE
   continue <- FALSE
   rowcol = as.logical(rowcol)
+  
   if(design == "RCBD"){
     r <- as.integer(rcbd_r) 
     first <- as.logical(rcbd_first)
     continue <- as.logical(rcbd_continue)
   }
   if(design == "CRD"){
-    r <- as.integer(r)  
+    r <- as.integer(crd_r)
+    first <- as.logical(crd_first)
+    continue <- as.logical(crd_continue)
   }
   if(design == "LSD"){
     #r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
+  
+  if((design=="ABD")){
+    trt2 <- get_germplasm_ids(abd_trt2)
+    r <- as.integer(abd_r)
+    first <- as.logical(abd_first)
+#     continue <- as.logical(abd_continue)
+  }
+  
   if(design == "GLD"){
     trt2 <- get_germplasm_ids(gld_trt2)
   }
@@ -173,6 +192,11 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "LSD"){
     out <- design_lsd(trt, serie, seed, kinds)
   }
+
+  if(design == "ABD"){
+    out <- design_abd(trt,trt2, serie, seed, kinds)
+  }
+  
   if(design == "GLD"){
     out <- design_gld(trt, trt2, serie, seed, kinds)
   }
@@ -346,18 +370,36 @@ output$doe_full_fieldbook_name <- renderText({
     
 })
 
+
 germlist <- reactive({
   file1 <- input$doe_germ_inputfile
   if(is.null(file1)){return()}
-  germ_list <- read.csv(file = file1$datapath,header = TRUE)
-  
+  germ_list <- read.csv(file = file1$datapath,header = TRUE)[["INSTN"]] %>% as.character()
 })
+
+#begin genotypes that we use as checks in the field
+genochecks <- reactive({
+  file2 <- input$abd_check_inputfile
+  if(is.null(file2)){return()}
+  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+})
+#end genochecks
+
 
 output$doe_germ_table <- renderTable({
-    head(germlist(),n = 4)
+  pol <- as.data.frame(germlist())  
+  #head(germlist(),n = 4)
+  head(pol,n=4)
 })
 
 
+output$doe_genochecks_table <- renderTable({
+  pol <- as.data.frame(genochecks())  
+  #head(germlist(),n = 4)
+  head(pol,n=4)
+  
+  
+})
 
 
 
