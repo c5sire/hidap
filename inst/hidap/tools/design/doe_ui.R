@@ -168,14 +168,14 @@ output$options_doe <- renderUI({
       
       h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
-<<<<<<< HEAD
+
       verbatimTextOutput(outputId = "doe_full_fieldbook_name")
       
    
       
-=======
+
       verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
->>>>>>> d998a245b322053bfd1c69529772506e698b0f73
+
     ), 
     
     
@@ -237,7 +237,7 @@ output$options_doe <- renderUI({
       ),
       
         conditionalPanel(condition =  "input.design == 'ABD' ", 
-<<<<<<< HEAD
+
             wellPanel(
              selectInput("abd_r", "r:", 2:1000, 3),
 #              checkboxInput("abd_first", "Randomize first block", FALSE), 
@@ -328,7 +328,7 @@ output$options_doe <- renderUI({
       ),
       conditionalPanel(condition =  "input.design == 'AD' ", 
          selectInput("ad_k", "k:", 2:30, 2)
-=======
+
                          wellPanel(
                            selectInput("abd_r", "r:", 2:1000, 3),
                            checkboxInput("abd_first", "Randomize first block", FALSE), 
@@ -352,7 +352,7 @@ output$options_doe <- renderUI({
       conditionalPanel(condition =  "input.design == 'GLD' ", 
          selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
                                            multiple = FALSE)
->>>>>>> d998a245b322053bfd1c69529772506e698b0f73
+
       )
       
       
@@ -460,7 +460,7 @@ output$doe <- renderUI({
          
         tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"),icon = icon("fa fa-building-o fa-2x")), 
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
-<<<<<<< HEAD
+
         tabPanel("Fielbook draft", 
                  dataTableOutput("fieldbook_doe"),
                  downloadButton('downloadData', 'Download')
@@ -471,9 +471,9 @@ output$doe <- renderUI({
                  
                  
                  )
-=======
+
         tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
->>>>>>> d998a245b322053bfd1c69529772506e698b0f73
+
           
         })
          

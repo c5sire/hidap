@@ -107,13 +107,11 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
                                     
                 lsd_r=2, lsd_first = FALSE,
-<<<<<<< HEAD
                 abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
                 #abd_r=2, #abd_first =FALSE
 =======
                 abd_trt2= "A", abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
                 
->>>>>>> d998a245b322053bfd1c69529772506e698b0f73
                 
                 gld_trt2 = "A",
                 
@@ -154,7 +152,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     first <- as.logical(lsd_first)
   }
   
-<<<<<<< HEAD
+
   if(design == "ABD"){
 #     trt <- trt2
 #     trt2 <- trt
@@ -421,11 +419,9 @@ output$doe_full_fieldbook_name <- renderText({
     
 })
 
-<<<<<<< HEAD
 #list of the genotypes on the fieldbook
 =======
 
->>>>>>> d998a245b322053bfd1c69529772506e698b0f73
 germlist <- reactive({
   
   
@@ -484,9 +480,7 @@ output$doe_genochecks_table <- renderTable({
 # })
 
 ##################DownloadData ()
-
-
-output$downloadData <- downloadHandler(
+ output$downloadData <- downloadHandler(
   filename = function() { paste("fbelisa", '.csv', sep='') },
   content = function(file) {
     write.csv(.fieldbook_doe(), file, na="",row.names=FALSE,col.names=FALSE)
