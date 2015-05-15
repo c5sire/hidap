@@ -107,8 +107,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
                                     
                 lsd_r=2, lsd_first = FALSE,
+<<<<<<< HEAD
                 abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
                 #abd_r=2, #abd_first =FALSE
+=======
+                abd_trt2= "A", abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
+                
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
                 
                 gld_trt2 = "A",
                 
@@ -149,6 +154,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     first <- as.logical(lsd_first)
   }
   
+<<<<<<< HEAD
   if(design == "ABD"){
 #     trt <- trt2
 #     trt2 <- trt
@@ -173,6 +179,15 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 
 
 
+=======
+  if((design=="ABD")){
+    trt2 <- get_germplasm_ids(abd_trt2)
+    r <- as.integer(abd_r)
+    first <- as.logical(abd_first)
+#     continue <- as.logical(abd_continue)
+  }
+  
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
   if(design == "GLD"){
     trt2 <- get_germplasm_ids(gld_trt2)
   }
@@ -215,8 +230,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     out <- design_lsd(trt, serie, seed, kinds)
   }
 
+<<<<<<< HEAD
   if(design == "ABD"){ #trt2::genotypes & trt:: genotypes
     out <- design_abd(trt2,trt, r, serie, seed, kinds)
+=======
+  if(design == "ABD"){
+    out <- design_abd(trt,trt2, serie, seed, kinds)
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
   }
   
   if(design == "GLD"){
@@ -401,15 +421,31 @@ output$doe_full_fieldbook_name <- renderText({
     
 })
 
+<<<<<<< HEAD
 #list of the genotypes on the fieldbook
+=======
+
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
 germlist <- reactive({
   
   
   file1 <- input$doe_germ_inputfile
   if(is.null(file1)){return()}
   germ_list <- read.csv(file = file1$datapath,header = TRUE)[["INSTN"]] %>% as.character()
+<<<<<<< HEAD
   
+=======
 })
+
+#begin genotypes that we use as checks in the field
+genochecks <- reactive({
+  file2 <- input$abd_check_inputfile
+  if(is.null(file2)){return()}
+  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
+})
+#end genochecks
+
 
 #begin genotypes that we use as checks in the field
 genochecks <- reactive({

@@ -20,9 +20,14 @@ design_lsd <- function(trt, ...){
 }
 
 design_abd <- function(trt,trt2,...){
+<<<<<<< HEAD
   #en augmented block design trt:: checks & trt2::genotypes
   n = length(trt2)
   if(n < 3 | n > 100000000) stop("The number of treatments in Augmented Block design must be >3.")
+=======
+  n=length(trt)
+  if(n < 3 | n > 100000000) strop("The number of treatments in Augmented Block design must be >3 and < 11.")
+>>>>>>> d998a245b322053bfd1c69529772506e698b0f73
   design.dau(trt,trt2, ...)
 }
 
