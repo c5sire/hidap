@@ -169,12 +169,7 @@ output$options_doe <- renderUI({
       h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
 
-      verbatimTextOutput(outputId = "doe_full_fieldbook_name")
-      
-   
-      
-
-      verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
+        verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
 
     ), 
     
@@ -328,26 +323,27 @@ output$options_doe <- renderUI({
       ),
       conditionalPanel(condition =  "input.design == 'AD' ", 
          selectInput("ad_k", "k:", 2:30, 2)
+      ),
 
-                         wellPanel(
-                           selectInput("abd_r", "r:", 2:1000, 3),
-                           checkboxInput("abd_first", "Randomize first block", FALSE), 
-                           checkboxInput("abd_continue", "Use continuous numeration", FALSE),
-                           br(),
-                                                      
-                           fluidRow(
-                             column(3,
-                                    tags$textarea(id="abd_check_txtarea", rows="10", style="width:300px;", "")),
-                             br(),
-                             
-                             column(6,offset = 2,
-                                    fileInput(inputId = "abd_check_inputfile",label = "Check-Genotipes List")
-                                    #tableOutput("doe_germ_table") 
-                                    #tableOutput("doe_germ_table")                                
-                             )
-                           )                      
-                         )
-        ),
+#       wellPanel(
+#       selectInput("abd_r", "r:", 2:1000, 3),
+#       checkboxInput("abd_first", "Randomize first block", FALSE), 
+#       checkboxInput("abd_continue", "Use continuous numeration", FALSE),
+#       br(),
+#                                                       
+#       fluidRow(
+#                column(3,
+#                tags$textarea(id="abd_check_txtarea", rows="10", style="width:300px;", "")),
+#                br(),
+#                       
+#                 column(6,offset = 2,
+#                                     fileInput(inputId = "abd_check_inputfile",label = "Check-Genotipes List")
+#                                     #tableOutput("doe_germ_table") 
+#                                     #tableOutput("doe_germ_table")                                
+#                              )
+#                            )                      
+#             )
+        #),
 
       conditionalPanel(condition =  "input.design == 'GLD' ", 
          selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
@@ -472,7 +468,7 @@ output$doe <- renderUI({
                  
                  )
 
-        tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
+#         tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
 
           
         })
