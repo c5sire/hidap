@@ -476,7 +476,7 @@ output$doe_genochecks_table <- renderTable({
 # #      paste(p)   
 # })
 
-##################DownloadData ()
+#################DownloadData ()
  output$downloadData <- downloadHandler(
 #    file_pot <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
 #    
@@ -492,9 +492,52 @@ output$doe_genochecks_table <- renderTable({
   }
 
   
-  
-  
 )
+#  output$downloadData <- downloadHandler(
+# #    file_pot <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
+# #    
+# #    from <- "Z:/hidap/inst/hidap/templates/potato"
+# #    to <- "Z:/hidap/inst/hidap/data"
+# #    file_name <- input$
+# #    
+# 
+#    
+#   filename = function() { 
+#     
+#     .template <- input$doe_template     
+#     .date <- input$doe_date 
+#     .trialSite <- input$doe_trialSite 
+#     begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
+#     begin_date_year <- begin_date[1]
+#     begin_date_month <- begin_date[2]
+#     
+#     if(is.null(.template))({ return() })
+#     if(is.null(.date))({return()})
+#     if(is.null(.trialSite))({return()})
+#     #paste(.template,date[1],"_",.trialSite,sep="")
+#     
+#     file_name <- paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
+#     
+#     folder_name <- "Z:/hidap/inst/hidap/templates/potato/"
+#     trial_name <- paste("template_",input$doe_template)
+#     from <- paste(folder_name,trial_name,".xls",sep="")
+#     
+#     to <- paste("Z:/hidap/inst/hidap/data/",file_name,".xls",sep = "")
+#     
+#     file.copy(from,to,overwrite = TRUE)
+#   
+#     return(to)
+#   } ,
+#     
+#   content = function(file) {
+#     openxlsx::write.xlsx(.fieldbook_doe(),file = file,sheetName = "Fieldbook",col.names = TRUE,row.names = TRUE,append = TRUE,showNA = FALSE)
+#     
+#   }
+# 
+#   
+#   
+#   
+# )
 
 
 
