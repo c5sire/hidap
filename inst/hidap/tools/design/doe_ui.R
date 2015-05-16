@@ -159,10 +159,16 @@ output$options_doe <- renderUI({
       selectInput(inputId = "doe_template",label = "Type of Trial (Template)",choices = c("PTYL","SPYL"),
                   selected = c("PTLY"), multiple = FALSE),
       
-      dateInput('doe_date',
-                label = 'Date input: yyyy-mm-dd',startview = "year",
-                value = Sys.Date()
+#       dateInput('doe_date',
+#                 label = 'Date input: yyyy-mm-dd',startview = "year",
+#                 value = Sys.Date()
+#       ),
+      
+      dateRangeInput('doe_date',
+                     label = 'Date range input: yyyy-mm-dd',
+                     start = Sys.Date() - 2, end = Sys.Date() + 2,startview = "year"
       ),
+      
   
       selectInput(inputId = "doe_trialSite",label = "Trial Site", choices = c("CIPHQ","NAROK"),selected = c("CIPHQ"),multiple = FALSE),
       
@@ -459,9 +465,9 @@ output$doe <- renderUI({
 
         tabPanel("Fielbook draft", 
                  dataTableOutput("fieldbook_doe"),
-                 downloadButton('downloadData', 'Download')
-                                 
-                 ,icon = icon("fa fa-table fa-2x")
+                 downloadButton('downloadData', 'Download'),
+                  
+                 icon = icon("fa fa-table fa-2x")
                  
                  
                  

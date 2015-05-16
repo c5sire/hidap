@@ -238,7 +238,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "SPPD"){
     out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds, first)
   }
-
+ 
   if(design == "YD"){
     out <- design_yd(trt, r, serie, seed, kinds, first)
   }
@@ -403,13 +403,18 @@ fieldbook.doe <- function(object, ...){
 
 output$doe_full_fieldbook_name <- renderText({
      .template <- input$doe_template     
-     .date <- input$doe_date
-     .trialSite <- input$doe_trialSite
-    
+     .date <- input$doe_date 
+     .trialSite <- input$doe_trialSite 
+             
+     begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
+     begin_date_year <- begin_date[1]
+     begin_date_month <- begin_date[2]
+     
     if(is.null(.template))({ return() })
     if(is.null(.date))({return()})
     if(is.null(.trialSite))({return()})
-    paste(.template,.date,"_",.trialSite,sep="")
+    #paste(.template,.date[1],"_",.trialSite,sep="")
+    paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
     
 })
 
@@ -473,10 +478,22 @@ output$doe_genochecks_table <- renderTable({
 
 ##################DownloadData ()
  output$downloadData <- downloadHandler(
+#    file_pot <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
+#    
+#    from <- "Z:/hidap/inst/hidap/templates/potato"
+#    to <- "Z:/hidap/inst/hidap/data"
+#    file_name <- input$
+#    
+   
+   
   filename = function() { paste("fbelisa", '.csv', sep='') },
   content = function(file) {
     write.csv(.fieldbook_doe(), file, na="",row.names=FALSE,col.names=FALSE)
   }
+
+  
+  
+  
 )
 
 
