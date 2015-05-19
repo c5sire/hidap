@@ -401,21 +401,40 @@ fieldbook.doe <- function(object, ...){
 
 #####################Added by Omar Benites
 
+full_fieldbook_name_reactive <- reactive({
+  .template <- input$doe_template     
+  .date <- input$doe_date 
+  .trialSite <- input$doe_trialSite 
+  
+  begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
+  begin_date_year <- begin_date[1]
+  begin_date_month <- begin_date[2]
+  
+  if(is.null(.template))({ return() })
+  if(is.null(.date))({return()})
+  if(is.null(.trialSite))({return()})
+  #paste(.template,.date[1],"_",.trialSite,sep="")
+  paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
+  
+})
+
+
 output$doe_full_fieldbook_name <- renderText({
-     .template <- input$doe_template     
-     .date <- input$doe_date 
-     .trialSite <- input$doe_trialSite 
-             
-     begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
-     begin_date_year <- begin_date[1]
-     begin_date_month <- begin_date[2]
-     
-    if(is.null(.template))({ return() })
-    if(is.null(.date))({return()})
-    if(is.null(.trialSite))({return()})
-    #paste(.template,.date[1],"_",.trialSite,sep="")
-    paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
-    
+#      .template <- input$doe_template     
+#      .date <- input$doe_date 
+#      .trialSite <- input$doe_trialSite 
+#              
+#      begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
+#      begin_date_year <- begin_date[1]
+#      begin_date_month <- begin_date[2]
+#      
+#     if(is.null(.template))({ return() })
+#     if(is.null(.date))({return()})
+#     if(is.null(.trialSite))({return()})
+#     #paste(.template,.date[1],"_",.trialSite,sep="")
+#     paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
+#     
+  full_fieldbook_name_reactive()
 })
 
 #list of the genotypes on the fieldbook
@@ -441,12 +460,12 @@ genochecks <- reactive({
 
 
 #begin genotypes that we use as checks in the field
-genochecks <- reactive({
-  file2 <- input$abd_check_inputfile
-  if(is.null(file2)){return()}
-  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
-})
-#end genochecks
+# genochecks <- reactive({
+#   file2 <- input$abd_check_inputfile
+#   if(is.null(file2)){return()}
+#   geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+# })
+# #end genochecks
 
 
 output$doe_germ_table <- renderTable({
@@ -469,30 +488,148 @@ output$doe_genochecks_table <- renderTable({
 
 # output$doe_germ_table <- renderText({
 #       
-# #      file <- input$doe_germ_inputfile
-# #      p <- file$datapath
-# #      if(is.null(file)){return()}
-# # #      readxl::read_excel(path = file$datapath,1,col_names = TRUE)
-# #      paste(p)   
+#      file <- input$doe_germ_inputfile
+#      p <- file$datapath
+#      if(is.null(file)){return()}
+#       readxl::read_excel(path = file$datapath,1,col_names = TRUE)
+#      paste(p)   
 # })
 
-#################DownloadData ()
- output$downloadData <- downloadHandler(
-#    file_pot <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
-#    
-#    from <- "Z:/hidap/inst/hidap/templates/potato"
-#    to <- "Z:/hidap/inst/hidap/data"
-#    file_name <- input$
-#    
-   
-   
-  filename = function() { paste("fbelisa", '.csv', sep='') },
-  content = function(file) {
-    write.csv(.fieldbook_doe(), file, na="",row.names=FALSE,col.names=FALSE)
-  }
+################DownloadData ()
+# output$downloadData <- downloadHandler(
+#   
+#   filename = function() { paste("fbelisa", '.csv', sep='') },
+#     content = function(file) {
+#     write.csv(.fieldbook_doe(), file, na="",row.names=FALSE,col.names=FALSE)
+#   }
+# 
+#   
+# )
 
+# 
+# output$fieldbook_export <- renderPrint({
+#   input$fieldbook_export_button_doe
+#   #g <- isolate(.fieldbook_doe())
+#  
+#   
+#   #if(!is.null(input$fieldbook_export_button_doe)){ 
+#   file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
+#   
+#   print(file_from)
+#   #from <- "Z:/hidap/inst/hidap/templates/potato"
+#   from <- file.path(file_from)
+#   print(from)
+#   file_to <- "Z:/hidap/inst/hidap/data"
+#   
+#   to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+#   print(to)
+#   #file <- to
+#   file.copy(from=from,to=to)
+#   #openxlsx::write.xlsx(.fieldbook_doe(),file = file, sheetName = "Fieldbook",col.names = TRUE,row.names = TRUE,append = TRUE,showNA = FALSE)
+#    wb <- openxlsx::loadWorkbook(to)
+# #   openxlsx::addWorksheet(wb,sheetName = "Fieldbook")
+# # #   #openxlsx::addWorksheet(wb = wb,sheetName = "Fieldbook",header = "center")
+# # #   #openxlsx::writeData(wb = wb,sheet = "Fieldbook",x = .fieldbook_doe(),colNames = TRUE,rowNames = FALSE,withFilter = TRUE,keepNA = FALSE)
+# # #   x <- as.data.frame(.fieldbook_doe())
+# # #   #openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = .fieldbook_doe(),colNames = TRUE,rowNames = FALSE,keepNA = FALSE)
+# #   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# #    wb <- xlsx::loadWorkbook(to)
+# #    sheet <- xlsx::createSheet(wb = wb,sheetName="Fieldbook")
+# #    #xlsx::addDataFrame(x = .fieldbook_doe(),sheet = sheet ,col.names = TRUE,row.names = FALSE)
+# #    xlsx::saveWorkbook(wb = wb,file = to)
+# #    #readxl::read_excel(path = to,sheet = "Fieldbook",col_names = TRUE)
+# #    #xlsx::write.xlsx(x = .fieldbook_doe(),file = to,sheetName = "Fieldbook",append = TRUE)
+# #    xlsx::write.xlsx(.fieldbook_doe(), file=to, sheetName="Fieldbook2", 
+# #            col.names=TRUE, row.names=FALSE, append=TRUE, showNA=FALSE)
+#   openxlsx::addWorksheet(wb, "Fieldbook")
+#   openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = .fieldbook_doe())
+#   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# #   
+# #   openxlsx::writeData()
+# #   
+# #   if(file.exists(to)){
+# #     print(to)
+# #     shell.exec(to)
+# #   }
+#   getwd()
+#   paste("Fieldbook succesfully created")
+# #}
+#   
+# 
+# })
+
+observe({ #begin observe
+  if(is.null(input$fieldbook_export_button_doe)){NULL}
+  if(!is.null(input$fieldbook_export_button_doe)){ #not run being inizialited
+    
+    isolate({
+    
+    file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
+    
+    print(file_from)
+    from <- file.path(file_from)
+    print(from)
+    file_to <- "Z:/hidap/inst/hidap/data"
+    to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+    print(to)
+    #file <- to
+    
+   
+      if(!file.exists(to)){
+      file.copy(from=from,to=to)
+      
+      
   
-)
+      wb <- openxlsx::loadWorkbook(to)
+      openxlsx::addWorksheet(wb, "Fieldbook")
+      openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
+      openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+      
+      shell.exec(to)
+      }
+    })
+    
+  }
+   
+  
+}) #end observe
+
+
+
+
+
+# output$test <- renderPrint({
+#   input$aa
+#   
+#   isolate(class(iris))
+# })
+
+
+
+
+
+# 
+# output$downloadData  <-  downloadHandler(
+#   filename = function() { paste(full_fieldbook_name_reactive(),".xls",sep = "")},
+#   content = function(file){
+#     
+#     file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
+#     #from <- "Z:/hidap/inst/hidap/templates/potato"
+#     from <- file.path(file_from)
+#     file_to <- "Z:/hidap/inst/hidap/data"
+#     to <- file.path(file_to,full_fieldbook_name_reactive
+#     #file <- to
+#     file.copy(from=from,to=to,overwrite = TRUE)
+#     
+#     #openxlsx::write.xlsx(.fieldbook_doe(),file = file, sheetName = "Fieldbook",col.names = TRUE,row.names = TRUE,append = TRUE,showNA = FALSE)
+#     openxlsx::write.xlsx(.fieldbook_doe(),file = to, sheetName = "Fieldbook",col.names = TRUE,row.names = TRUE,append = TRUE,showNA = FALSE)
+#     
+#   }
+#   
+#   
+#   )
+
+###############################################################
 #  output$downloadData <- downloadHandler(
 # #    file_pot <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xls"
 # #    

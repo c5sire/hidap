@@ -191,7 +191,7 @@ output$options_doe <- renderUI({
              tags$textarea(id="doe_germ_txtarea", rows="10", style="width:300px;", "")),
       br(),
       
-        column(6,offset = 2,
+        column(6,offset = 3,
             fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
             #tableOutput("doe_germ_table")
             tableOutput("doe_germ_table")
@@ -466,13 +466,11 @@ output$doe <- renderUI({
         tabPanel("Fielbook draft", 
                  dataTableOutput("fieldbook_doe"),
                  downloadButton('downloadData', 'Download'),
-                  
+                 actionButton("fieldbook_export_button_doe", "Click to export your fieldbook"),
+                 p("Click on the procces"),               
                  icon = icon("fa fa-table fa-2x")
-                 
-                 
-                 
-                 
-                 )
+               
+             )
 
 #         tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
 
