@@ -420,20 +420,6 @@ full_fieldbook_name_reactive <- reactive({
 
 
 output$doe_full_fieldbook_name <- renderText({
-#      .template <- input$doe_template     
-#      .date <- input$doe_date 
-#      .trialSite <- input$doe_trialSite 
-#              
-#      begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
-#      begin_date_year <- begin_date[1]
-#      begin_date_month <- begin_date[2]
-#      
-#     if(is.null(.template))({ return() })
-#     if(is.null(.date))({return()})
-#     if(is.null(.trialSite))({return()})
-#     #paste(.template,.date[1],"_",.trialSite,sep="")
-#     paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
-#     
   full_fieldbook_name_reactive()
 })
 
@@ -441,7 +427,6 @@ output$doe_full_fieldbook_name <- renderText({
 
 
 germlist <- reactive({
-  
   
   file1 <- input$doe_germ_inputfile
   if(is.null(file1)){return()}
@@ -460,12 +445,12 @@ genochecks <- reactive({
 
 
 #begin genotypes that we use as checks in the field
-# genochecks <- reactive({
-#   file2 <- input$abd_check_inputfile
-#   if(is.null(file2)){return()}
-#   geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
-# })
-# #end genochecks
+genochecks <- reactive({
+  file2 <- input$abd_check_inputfile
+  if(is.null(file2)){return()}
+  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+})
+#end genochecks
 
 
 output$doe_germ_table <- renderTable({
@@ -484,6 +469,121 @@ output$doe_genochecks_table <- renderTable({
 })
 
 
+observe({ #begin observe
+  if(is.null(input$fieldbook_export_button_doe)){NULL}
+  if(!is.null(input$fieldbook_export_button_doe)){ #not run being inizialited
+    
+    isolate({
+      
+      file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
+      
+      print(file_from)
+      from <- file.path(file_from)
+      print(from)
+      file_to <- "Z:/hidap/inst/hidap/data"
+      to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+      print(to)
+      #file <- to
+      
+      if(!file.exists(to)){
+        file.copy(from=from,to=to)
+        
+#         add.date(to, "Minimal", row.label = "Begin date", col.name = "Value",input$doe_date,1)
+#         add.date(to, "Minimal", row.label = "End date", col.name = "Value",input$doe_date,2)
+        add.vals.to.fb(to = to,col.name = "Value",reactive_value = full_fieldbook_name_reactive(),
+                       input_value= input$doe_date,fb_reactive=.fieldbook_doe())        
+
+
+        #add.short.name(to = to,sheetName = "Minimal",row.label = "Short name or Title",col.name = "Value",reactive_value = full_fieldbook_name_reactive())        
+
+        print("print 1 step: Minimal data")
+        
+#         wb <- openxlsx::loadWorkbook(to)
+#         openxlsx::addWorksheet(wb, "Fieldbook")
+#         openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
+#         openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+#         
+        print("print 2 step: Fieldbook")
+        
+        shell.exec(to)
+      }
+    })
+    
+  }
+  
+}) #end observe
+
+# add.short.name <- function(to,sheetName,row.label,col.name,reactive_value){
+#   wb <- openxlsx::loadWorkbook(to) 
+#   data_hidap <- readxl::read_excel(path = to,sheet = sheetName)
+#   data_hidap[data_hidap$Factor==row.label,col.name] <- paste(isolate(reactive_value))
+#   openxlsx::writeDataTable(wb,sheet = sheetName,x = data_hidap,colNames = TRUE,withFilter = FALSE)
+#   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# }
+# 
+# add.date <- function(to, sheetName, row.label,col.name,input_value,pos){
+#   input_val <- input_value
+#   input_val <- input_val[pos]
+#   wb <- openxlsx::loadWorkbook(to)
+#   data_hidap <- readxl::read_excel(path = to,sheet = sheetName)
+#   data_hidap[data_hidap$Factor==row.label,col.name] <- paste(as.character(input_val))
+#   openxlsx::writeDataTable(wb,sheet = sheetName,x = data_hidap,colNames = TRUE,withFilter = FALSE)
+#   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# }
+
+add.vals.to.fb <- function(to, col.name, reactive_value,input_value,fb_reactive,germ_list){
+  wb <- openxlsx::loadWorkbook(to) 
+  data_hidap <- readxl::read_excel(path = to,sheet = "Minimal")
+  data_hidap[data_hidap$Factor=="Short name or Title",col.name] <- paste(isolate(reactive_value))
+  #openxlsx::writeDataTable(wb,sheet = sheetName,x = data_hidap,colNames = TRUE,withFilter = FALSE)
+  #openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+  
+  input_val <- input_value
+  #wb <- openxlsx::loadWorkbook(to)
+  #data_hidap <- readxl::read_excel(path = to,sheet = sheetName)
+  data_hidap[data_hidap$Factor=="Begin date",col.name] <- paste(as.character(input_val[1]))
+  data_hidap[data_hidap$Factor=="End date",col.name] <- paste(as.character(input_val[2]))
+  openxlsx::writeDataTable(wb,sheet = "Minimal",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+  #openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+  
+  ##Material List sheet
+  file1 <- input$doe_germ_inputfile
+  if(is.null(file1)){return()}
+  if(!is.null(file1)){
+  mat_list_sheet <- openxlsx::read.xlsx(xlsxFile = to,sheet = "Material List",colNames = TRUE,skipEmptyRows = TRUE)
+  names_mat_list <- names(mat_list_sheet)
+  germ_list_user<- read.csv(file = file1$datapath,header = TRUE)
+  Numeration <- 1:nrow(germ_list_user)
+  datos <- cbind(Numeration,germ_list_user)
+  names(datos) <- stringr::str_replace_all(string = names(mat_list_sheet),pattern = "\\.",replacement = " ")
+  openxlsx::writeDataTable(wb = wb,sheet = "Material List",x = datos,colNames = TRUE,withFilter = FALSE)
+  }
+  
+  openxlsx::addWorksheet(wb, "Fieldbook")
+  openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({fb_reactive}))
+  openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)  
+
+  
+
+
+
+
+}
+
+
+
+# output$columns = renderUI({
+#   mydata = get(input$doe_trialSite)
+#   selectInput('columns2', 'Columns', names(mydata))
+# })
+
+
+
+
+# output$columns = renderUI({
+#   mydata = get(input$doe_trialSite)
+#   selectInput('columns2', 'Columns', names(mydata)   )
+# })
 
 
 # output$doe_germ_table <- renderText({
@@ -557,43 +657,6 @@ output$doe_genochecks_table <- renderTable({
 #   
 # 
 # })
-
-observe({ #begin observe
-  if(is.null(input$fieldbook_export_button_doe)){NULL}
-  if(!is.null(input$fieldbook_export_button_doe)){ #not run being inizialited
-    
-    isolate({
-    
-    file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
-    
-    print(file_from)
-    from <- file.path(file_from)
-    print(from)
-    file_to <- "Z:/hidap/inst/hidap/data"
-    to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
-    print(to)
-    #file <- to
-    
-   
-      if(!file.exists(to)){
-      file.copy(from=from,to=to)
-      
-      
-  
-      wb <- openxlsx::loadWorkbook(to)
-      openxlsx::addWorksheet(wb, "Fieldbook")
-      openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
-      openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
-      
-      shell.exec(to)
-      }
-    })
-    
-  }
-   
-  
-}) #end observe
-
 
 
 

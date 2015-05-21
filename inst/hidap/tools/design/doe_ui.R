@@ -167,15 +167,33 @@ output$options_doe <- renderUI({
       dateRangeInput('doe_date',
                      label = 'Date range input: yyyy-mm-dd',
                      start = Sys.Date() - 2, end = Sys.Date() + 2,startview = "year"
-      ),
-      
-  
-      selectInput(inputId = "doe_trialSite",label = "Trial Site", choices = c("CIPHQ","NAROK"),selected = c("CIPHQ"),multiple = FALSE),
-      
+      ),    
+     
+
+      selectInput(inputId = "doe_trialSite",label = "Trial Site", 
+                  choices = c("Experimental station CIP headquarters"='CIPHQ',"NAROK"='NAROK'),
+                  selected = c('CIPHQ'),multiple = FALSE),
+#         selectizeInput(inputId = "doe_trialSite",label = "Select Trial Country", 
+#                   choices = c("Africa"='Africa',"Asia"='Asia',"Europe"='Europe',"South America"='South America'),
+#                   selected = c('Africa'),),
+        
+#         selectInput(inputId = 'doe_trialSite', 'Select Trial Country',  
+#                     choices = c(Country='', "Angola"='ANG',"Nigeria"='NIG',"Peru"='PER'), 
+#                     selectize=TRUE),
+        
+        
+
+#         uiOutput('columns'),
+
+
+#       selectInput(inputId = "doe_trialSite",label = "Trial Site",  
+#                   choices = c("Choose a country"='',"Experimental station CIP headquarters"='CIPHQ',"NAROK"='NAROK'),
+#                   selectize=FALSE),
+            
       h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
-
-        verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
+      
+      verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
 
     ), 
     
