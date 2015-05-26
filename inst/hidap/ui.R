@@ -4,11 +4,13 @@ app_title <- "HIDAP"
 shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
         collapsible = TRUE,
   
-  tabPanel("Dashboard", withMathJax(), uiOutput("ui_dashboard")),      
+  #tabPanel("Dashboard", withMathJax(), uiOutput("ui_dashboard")), 
+  tabPanel("Dashboard", withMathJax(), uiOutput("ui_dashboard")),    
   tabPanel("Design", withMathJax(), uiOutput("doe")),      
+  #tabPanel("Design", uiOutput("doe")),      
   
   tabPanel("Data", withMathJax(), uiOutput('ui_data')),
-
+  #tabPanel("Data", uiOutput('ui_data')),
   navbarMenu("Analysis",
              tabPanel("Single mean", uiOutput("single_mean")),
              tabPanel("GWAS", uiOutput("ui_gwas"))

@@ -7,6 +7,7 @@ shinyServer(function(input, output, session) {
 	source('radiant.R', local = TRUE)
   source('renderInfoBox.R',local=TRUE) #added by Omar Benites
   source('data_dictionary.R',local=TRUE)
+  source('data_sites.R',local=TRUE)
   
 	# for shiny-server
  	if(!"package:radiant" %in% search()) {

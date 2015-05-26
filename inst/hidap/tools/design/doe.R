@@ -1,4 +1,9 @@
 #load("../../../data/primes.rda")
+fp_sites <- "Z:\\hidap\\inst\\hidap\\sites\\Master-list-trial-sites.xlsx"
+#fp_sites <- "Z:\\hidap\\inst\\hidap\\sites\\Master-list-trial-sites.xlsx"
+source("Z:\\hidap\\inst\\hidap\\data_sites.R")
+
+################
 library(agricolae)
 library(stringr)
 
@@ -212,7 +217,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   
   #print(serie)
   serie <- as.integer(serie)
-  
+   
   if(design == "CRD"){
     #out <- design.crd(trt, r, serie, seed, kinds)
     out <- design_crd(trt, r, serie, seed, kinds)
@@ -290,7 +295,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 #   save(out,file = "out.Rdata")
 
   environment() %>% as.list %>% set_class(c("doe",class(.)))
-
+ 
 #   print("el doe")
 #   t <- environment() %>% as.list %>% set_class(c("doe",class(.)))
 #   save(t,file = "doe.Rdata")
@@ -355,7 +360,7 @@ var_selected <- reactive({
   vars <- as.character(as.vector(vars))
   }
   vars
-})
+})#####################Added by Omar Benites
 
 
 fieldbook.doe <- function(object, ...){
@@ -401,10 +406,37 @@ fieldbook.doe <- function(object, ...){
 
 #####################Added by Omar Benites
 
+# lsites <- reactive({
+#   
+#   cntry <- input$CNTRY
+#   fsites <- filter_sites(data_sites(),country_input = cntry)
+#   fsites
+# })
+
+observe({       
+  if(is.null(input$CNTRY)){return()}
+  cntry <- input$CNTRY
+  fsites <- filter_sites(data_sites(),country_input = cntry)
+      
+  # else{
+  #  if(is.null(input$doe_trialSite)){return()}
+#   if(input$CNTRY=="Angola"){
+#     updateSelectInput(session,inputId="doe_trialSite", label = "Localities",choices = lsites())
+#   }
+  #if(!is.null(input$doe_trailSite)){
+    updateSelectInput(session,inputId="doe_trialSite", label = "Localities",choices = fsites)
+  #}
+  
+})
+
+
 full_fieldbook_name_reactive <- reactive({
   .template <- input$doe_template     
   .date <- input$doe_date 
+  
   .trialSite <- input$doe_trialSite 
+  #.trialSite <- unlist(str_split(.trialSite, pattern = " \\("))[2]
+  .trialSite <- unlist(str_split(.trialSite, pattern = " \\("))[2] %>% str_replace(.,pattern = ")",replacement="")
   
   begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
   begin_date_year <- begin_date[1]
@@ -415,6 +447,7 @@ full_fieldbook_name_reactive <- reactive({
   if(is.null(.trialSite))({return()})
   #paste(.template,.date[1],"_",.trialSite,sep="")
   paste(.template,begin_date_year,begin_date_month,"_",.trialSite,sep="")
+ 
   
 })
 
@@ -424,7 +457,7 @@ output$doe_full_fieldbook_name <- renderText({
 })
 
 #list of the genotypes on the fieldbook
-
+ 
 
 germlist <- reactive({
   
@@ -433,6 +466,7 @@ germlist <- reactive({
   germ_list <- read.csv(file = file1$datapath,header = TRUE)[["INSTN"]] %>% as.character()
 
 })
+
 
 #begin genotypes that we use as checks in the field
 genochecks <- reactive({
@@ -563,14 +597,46 @@ add.vals.to.fb <- function(to, col.name, reactive_value,input_value,fb_reactive,
   openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({fb_reactive}))
   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)  
 
-  
-
-
-
-
 }
 
 
+# observe({
+#   
+# #  if(is.null(input$CNTRY)) {return()}
+# #  if(!is.null(input$CNTRY)){
+# #       
+# #   if(input$CNTRY=="PERU"){
+# #     #updateSelectInput(session,inputId="LOCAL",choices=list("CIPHQ","LIMA","ACO"))
+# #     updateSelectInput(session,inputId="doe_trialSite",choices=list("CIPHQ","LIMA","ACO"))
+# #   }
+# #   
+# #   if(input$CNTRY=="KENIA"){
+# #     updateSelectInput(session,inputId="doe_trialSite",choices=list("LUMURU","NAIROBI"))
+# #   }
+# #   
+# #  }
+# #   
+#   p <- data_sites(fp_sites)
+#   r <- list_countries(p)
+#   fsites <- filter_sites(data_sites=p,country_input=input$CNTRY,locality_input=input$doe_trialSite)
+#   lsites <- list_sites(fsites)
+#   
+#   
+#  if(is.null(input$CNTRY)) {return()}
+#  if(!is.null(input$CNTRY)){
+#      if(input$CNTRY=="Angola"){
+#        #updateSelectInput(session,inputId="LOCAL",choices=list("CIPHQ","LIMA","ACO"))
+#        updateSelectInput(session,inputId="doe_trialSite",choices=list("Chinga","Ecunha","Humpata","Chibia"))
+#      }
+#      else {
+#        updateSelectInput(session,inputId="doe_trialSite",choices= lsites)
+#        
+#      }
+#      
+#      
+#      
+#  }
+# })   
 
 # output$columns = renderUI({
 #   mydata = get(input$doe_trialSite)
