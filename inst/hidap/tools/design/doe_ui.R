@@ -1,5 +1,5 @@
 #source("../hidap/tools/design/doe.R")
-source("Z:\\hidap\\inst\\hidap\\data_sites.R")
+#source("Z:\\hidap\\inst\\hidap\\data_sites.R")
 
 
 doe_args <- as.list(formals(doe))
@@ -63,7 +63,15 @@ observe({
 })
 
 #var_list:: variable list extracted from Potato and Sweetpotato Ontology.
-var_list <- data_dictionary(fp)
+
+#var_list <- data_dictionary(fp)
+
+
+
+# var_list <- data_dictionary(fp1)
+# 
+
+
 
 datasites <- data_sites()
 lcountries <- list_countries(datasites)
@@ -159,35 +167,47 @@ output$options_doe <- renderUI({
     wellPanel(style = "background-color: #DAEFEF;",
       
       selectInput(inputId = "doe_type_crop", label = "Type of Crop", choices = c("Potato","Sweetpotato"),
-                  selected = c("Potato"), multiple = FALSE ),
-      
-      
-      
-      
-      selectInput(inputId = "doe_template",label = "Type of Trial (Template)",choices = c("Healthy Tuber Yield"="PTYL","SPYL"),
-                  selected = c("PTLY"), multiple = FALSE),
+                 multiple = FALSE ),
+       
+#       conditionalPanel(
+#         condition = "input.doe_type_crop=='Potato'",
+#            selectInput(inputId = "doe_template_pt",label = "Type of Trial (Template)",choices = c("Potato Healthy Tuber Yield"="PTYL"),
+#                            selected = c("PTLY"), multiple = FALSE)     
+#                
+#       ),
+# #       
+#       conditionalPanel(
+#         condition = "input.doe_type_crop=='Sweetpotato'",
+#                selectInput(inputId = "doe_template_sp",label = "Type of Trial (Template)",choices = c("Sweetpotato Healthy Tuber Yield"="SPYL"),
+#                            selected = c("SPYL"), multiple = FALSE)    
+#         
+#       ),
+     selectInput(inputId = "doe_template",label = "Type of Trial (Template)", choices = ""),
+                 
       
 #       dateInput('doe_date',
 #                 label = 'Date input: yyyy-mm-dd',startview = "year",
 #                 value = Sys.Date()
 #       ),
-      
+     
       dateRangeInput('doe_date',
                      label = 'Date range input: yyyy-mm-dd',
                      start = Sys.Date() - 2, end = Sys.Date() + 2,startview = "year"
       )
-),    
+  ),    
      
 wellPanel(style = "background-color: #F5F5DC;",
       
-      shiny::selectInput(inputId = "CNTRY",label = "Country",choices =lcountries),
+      shiny::selectInput(inputId = "CNTRY",label = "Country",choices =lcountries,selectize = TRUE),
        
       #shiny::selectInput(inputId = "doe_trialSite",label = "Localities",choices = c("Chinga","Ecunha","Humpata","Chibia")),      
-      selectInput(inputId = 'doe_trialSite', label = 'Localities', choices = ""),
+      selectInput(inputId = 'doe_trialSite', label = 'Localities', choices = "",selectize = TRUE),
+  
+      shiny::selectInput(inputId = "doe_expenv",label = "Experimental Environment",choices = c("Field","Greenhouse","Laboratory"),selected = "Field"), 
       
-      h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
+     h5("File name preview",style = "font-family: 'Arial', cursive;font-weight: 500; line-height: 1.1; 
         color: #4d3a7d;"),
-    
+      
       verbatimTextOutput(outputId = "doe_full_fieldbook_name")  
     
     ), 
@@ -211,9 +231,7 @@ wellPanel(style = "background-color: #F5F5DC;",
             
             )
       )
-      
-      
-      ),
+  ),
     
     
     wellPanel(
@@ -415,22 +433,10 @@ wellPanel(style = "background-color: #F5F5DC;",
 output$fb_variables_doe <- renderUI({
   tagList(
     
-#        shinyBS::bsCollapse(id = "collapseExample", open = c("Panel 1"),
-#                     shinyBS::bsCollapsePanel("Panel 1", "This is a panel with just text ",
-#                                   checkboxGroupInput("vars_doe_pt",label = "Fiedlbook Variables",
-#                                   #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
-#                                   choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP"), selected = ""),
-#                                   style = "info")
-#                     ),
-       
-    radioButtons("crop_type",label = NULL,
-                 choices = list("Potato","Sweetpotato") 
-                 
-    ),      
      
     conditionalPanel(#begin conditional panel
-      condition = "input.crop_type=='Potato'",
-    
+     # condition = "input.crop_type=='Potato'",
+       condition = "input.doe_type_crop=='Potato'",
 #          wellPanel(style = "background-color: #99CC99;",
 #            checkboxGroupInput("vars_doe_pt",label = "Fiedlbook Variables" ,
 #                     #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
@@ -444,7 +450,8 @@ wellPanel(style = "background-color: #99CC99 ;",
                                "the sidebar.", 
                               checkboxGroupInput("vars_doe_pt",label = "Fiedlbook Variables",
                               #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
-                              choices = var_list, selected = ""),
+                              #choices = var_list, selected = ""),
+                              choices = var_list(crop="Potato"), selected = ""),
                               style = "info")
                 )
 
@@ -453,24 +460,27 @@ wellPanel(style = "background-color: #99CC99 ;",
     ), #end conditional panel
     
     conditionalPanel(
-      condition = "input.crop_type=='Sweetpotato'",
+      #condition = "input.crop_type=='Sweetpotato'",
+      condition = "input.doe_type_crop=='Sweetpotato'",
 #           wellPanel(style = "background-color: #99CC99;",
 #             checkboxGroupInput("vars_doe_sp",label = "Fiedlbook Variables" ,
 #                                choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
 #                                selected = ""))
-
-      shinyBS::bsCollapse(id = "collapseExample", open = c("Panel 1"),
-                    shinyBS::bsCollapsePanel("Panel 1", "This is a panel with just text ",
+#begin well panel
+wellPanel(style = "background-color: #99CC99 ;", 
+      shinyBS::bsCollapse(id = "collapseExample", open = c("Healthy Tuber and Yield"),
+                    shinyBS::bsCollapsePanel("Healthy Tuber and Yield", "This is a panel with just text ",
                                              "and has the default style. You can change the style in ",
                                              "the sidebar.", 
-                       checkboxGroupInput("vars_doe_pt",label = "Fiedlbook Variables",
-                                          #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
-                                          choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3), 
-                                          selected = ""),style = "success")
-                          )
-       )
+                                checkboxGroupInput("vars_doe_sp",label = "Fiedlbook Variables",
+                                #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3),
+                                #choices = list("Number of Plants Harvested" = "PPH", "Number of Plants Planted" = "NPP", "Choice 3" = 3), 
+                                choices = var_list(crop="Sweetpotato"),selected = ""),
+                                style = "info")
+                         )
+       )#end conditional panel
 )
-  
+  )  
   
 })
 

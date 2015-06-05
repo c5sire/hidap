@@ -1,7 +1,7 @@
 #load("../../../data/primes.rda")
-fp_sites <- "Z:\\hidap\\inst\\hidap\\sites\\Master-list-trial-sites.xlsx"
 #fp_sites <- "Z:\\hidap\\inst\\hidap\\sites\\Master-list-trial-sites.xlsx"
-source("Z:\\hidap\\inst\\hidap\\data_sites.R")
+#fp_sites <- "Z:\\hidap\\inst\\hidap\\sites\\Master-list-trial-sites.xlsx"
+#source("Z:\\hidap\\inst\\hidap\\data_sites.R")
 
 ################
 library(agricolae)
@@ -137,7 +137,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   #trt  <- get_germplasm_ids(trt)
   trt <- germlist()
   #trt2 <- get_germplasm_ids(trt2)
-  trt2 <- genochecks()
+  #trt2 <- genochecks()
   first <- FALSE
   continue <- FALSE
   rowcol = as.logical(rowcol)
@@ -156,11 +156,20 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     #r <- as.integer(lsd_r) 
     first <- as.logical(lsd_first)
   }
+ 
+  
+#   if((design=="ABD")){
+#     trt2 <- get_germplasm_ids(abd_trt2)
+#     r <- as.integer(abd_r)
+#     first <- as.logical(abd_first)
+#     #     continue <- as.logical(abd_continue)
+#   }
   
 
   if(design == "ABD"){
 #     trt <- trt2
 #     trt2 <- trt
+    trt2 <- genochecks()
     r <- as.integer(abd_r)
     #trt2 <- get_germplasm_ids(abd_trt2)
     first <- as.logical(abd_first)
@@ -171,23 +180,19 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     r <- as.integer(sppd_r)
     first <- as.logical(sppd_first)
     continue <- as.logical(sppd_continue) 
-    
+#     
     sub_design <- as.character(sppd_stat_design)
     sppd_factor_lvl1 <- sppd_factor_lvl1 %>% as.character() %>% str_trim(.,side = "both")
     sppd_factor_lvl2 <- sppd_factor_lvl2 %>% as.character() %>% str_trim(.,side = "both")
     sppd_factor_lvl3 <- sppd_factor_lvl3 %>% as.character() %>% str_trim(.,side = "both")
+    print(sppd_factor_lvl1)
+    print(sppd_factor_lvl2)
+    print(sppd_factor_lvl3)
     trt2 <- c(sppd_factor_lvl1,sppd_factor_lvl2,sppd_factor_lvl3)
-    
+    print(trt2)
+    trt2 <- trt2[!is.na(trt2) & trt2!=""]
+    print(trt2)
   }
-
-
-  if((design=="ABD")){
-    trt2 <- get_germplasm_ids(abd_trt2)
-    r <- as.integer(abd_r)
-    first <- as.logical(abd_first)
-#     continue <- as.logical(abd_continue)
-  }
-  
 
   if(design == "GLD"){
     trt2 <- get_germplasm_ids(gld_trt2)
@@ -350,12 +355,14 @@ summary.doe <- function(object, ...){
 
 var_selected <- reactive({
   
-  if(input$crop_type=='Potato'){
+  #if(input$crop_type=='Potato'){
+  if(input$doe_type_crop=='Potato'){
   vars <- input$vars_doe_pt 
   vars <- as.character(as.vector(vars))
   vars
   }
-  if(input$crop_type=="Sweetpotato"){
+  #if(input$crop_type=="Sweetpotato"){
+  if(input$doe_type_crop=="Sweetpotato"){
   vars <- input$vars_doe_sp  
   vars <- as.character(as.vector(vars))
   }
@@ -368,7 +375,41 @@ fieldbook.doe <- function(object, ...){
   x <- object$res #assigng all the features of the fieldbook
   
   fieldbook <- x$book #extract the fieldbook design
+  print("fb before")
+  print(head(fieldbook))
   
+  if(input$design=="RCBD"){ 
+    names(fieldbook) <- c("PLOT","REP","INSTN") 
+  }
+  if(input$design=="CRD"){ 
+    names(fieldbook) <- c("PLOT","REP","INSTN") 
+  }
+  if(input$design=="LSD"){ 
+    names(fieldbook) <- c("PLOT","REP","CBLOCK","INSTN") #column block
+  }
+  if(input$design=="SPPD"){
+    
+    if(input$sppd_stat_design=="crd"){
+      fieldbook <-  fieldbook[,c(1,3,5,4)]
+      names(fieldbook) <- c("PLOT","REP","FACTOR","INSTN") #column block
+    }
+    
+    if(input$sppd_stat_design=="rcbd"){
+      fieldbook <-  fieldbook[,c(1,3,5,4)]
+      names(fieldbook) <- c("PLOT","REP","FACTOR","INSTN") #column block
+    }    
+    
+    
+    if(input$sppd_stat_design=="lsd"){
+    fieldbook <-  fieldbook[,c(1,3,4,6,5)]
+    names(fieldbook) <- c("PLOT","REP","CBLOCK","FACTOR","INSTN") #column block
+    }
+    
+            
+  }
+  print("fb after")
+  print(head(fieldbook)) 
+   
 #   if(is.null(var_selected())){
 #     fieldbook
 #   }else{
@@ -382,6 +423,8 @@ fieldbook.doe <- function(object, ...){
     fieldbook[,var_selected()] <- NA 
     fieldbook 
   } 
+
+
 #   l <- nrow(x$book) 
 #   TTWP <- rep(46,times = l)
 #   TNTP <- rep(15,times=l)
@@ -412,12 +455,33 @@ fieldbook.doe <- function(object, ...){
 #   fsites <- filter_sites(data_sites(),country_input = cntry)
 #   fsites
 # })
-
+#For TYPE OF TRIAL
 observe({       
+  if(is.null(input$doe_type_crop)){return()}
+   # else{
+  #  if(is.null(input$doe_trialSite)){return()}
+  if(input$doe_type_crop=="Potato"){
+    updateSelectInput(session,inputId = "doe_template",label = "Type of Trial (Template)",
+                      choices = c("Potato Trial Healthy Tuber Yield (PTYL)"="PTYL"),selected = c("PTYL"))
+  }
+  
+  if(input$doe_type_crop=="Sweetpotato"){
+      updateSelectInput(session,inputId = "doe_template",label = "Type of Trial (Template)",
+                   choices = c("SweetPotato Trial Healthy Tuber Yield (SPYL)"="SPYL"),selected = c("SPYL"))
+    }
+  
+})
+
+#For TRIAL SITSE
+observe({
+  #if(input$CNTRY==""){return()}
   if(is.null(input$CNTRY)){return()}
+  
+    
+  #if(!is.null(input$CNTRY)){
   cntry <- input$CNTRY
   fsites <- filter_sites(data_sites(),country_input = cntry)
-      
+  fsites <- sort(fsites)    
   # else{
   #  if(is.null(input$doe_trialSite)){return()}
 #   if(input$CNTRY=="Angola"){
@@ -426,7 +490,7 @@ observe({
   #if(!is.null(input$doe_trailSite)){
     updateSelectInput(session,inputId="doe_trialSite", label = "Localities",choices = fsites)
   #}
-  
+  #}
 })
 
 
@@ -479,11 +543,11 @@ genochecks <- reactive({
 
 
 #begin genotypes that we use as checks in the field
-genochecks <- reactive({
-  file2 <- input$abd_check_inputfile
-  if(is.null(file2)){return()}
-  geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
-})
+# genochecks <- reactive({
+#   file2 <- input$abd_check_inputfile
+#   if(is.null(file2)){return()}
+#   geno_checks <- read.csv(file = file2$datapath,header = TRUE)[["CHECKS"]] %>% as.character()
+# })
 #end genochecks
 
 
@@ -502,50 +566,123 @@ output$doe_genochecks_table <- renderTable({
   
 })
 
-
-observe({ #begin observe
-  if(is.null(input$fieldbook_export_button_doe)){NULL}
-  if(!is.null(input$fieldbook_export_button_doe)){ #not run being inizialited
-    
-    isolate({
-      
-      file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
-      
-      print(file_from)
-      from <- file.path(file_from)
-      print(from)
-      file_to <- "Z:/hidap/inst/hidap/data"
-      to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
-      print(to)
-      #file <- to
-      
-      if(!file.exists(to)){
-        file.copy(from=from,to=to)
-        
-#         add.date(to, "Minimal", row.label = "Begin date", col.name = "Value",input$doe_date,1)
-#         add.date(to, "Minimal", row.label = "End date", col.name = "Value",input$doe_date,2)
-        add.vals.to.fb(to = to,col.name = "Value",reactive_value = full_fieldbook_name_reactive(),
-                       input_value= input$doe_date,fb_reactive=.fieldbook_doe())        
-
-
-        #add.short.name(to = to,sheetName = "Minimal",row.label = "Short name or Title",col.name = "Value",reactive_value = full_fieldbook_name_reactive())        
-
-        print("print 1 step: Minimal data")
-        
-#         wb <- openxlsx::loadWorkbook(to)
-#         openxlsx::addWorksheet(wb, "Fieldbook")
-#         openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
-#         openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# observe({ #begin observe
+#   if(is.null(input$fieldbook_export_button_doe)){return(NULL)}
+#   if(!is.null(input$fieldbook_export_button_doe)){ #not run being inizialited
+#     print("error1")
+#     isolate({
+#       
+#       file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
+#       
+#       print(file_from)
+#       from <- file.path(file_from)
+#       #print(from)
+#       file_to <- "Z:/hidap/inst/hidap/data"
+#       print("error2")  
+# #       directorio <- file.path(file_to,"potato","201545",sep = "")
+# #       dir.create(directorio)
+#       
+#       to <- file.path(file_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+#       #print(to)
+#       #file <- to
+#       print("error3")
+#       if(!file.exists(to)){
+#         file.copy(from=from,to=to)
 #         
-        print("print 2 step: Fieldbook")
-        
-        shell.exec(to)
-      }
-    })
-    
-  }
+# #         add.date(to, "Minimal", row.label = "Begin date", col.name = "Value",input$doe_date,1)
+# #         add.date(to, "Minimal", row.label = "End date", col.name = "Value",input$doe_date,2)
+#         add.vals.to.fb(to = to,col.name = "Value",reactive_value = full_fieldbook_name_reactive(),
+#                        input_value= input$doe_date,fb_reactive=.fieldbook_doe())        
+# 
+# 
+#         #add.short.name(to = to,sheetName = "Minimal",row.label = "Short name or Title",col.name = "Value",reactive_value = full_fieldbook_name_reactive())        
+# 
+#         print("print 1 step: Minimal data")
+#         
+# #         wb <- openxlsx::loadWorkbook(to)
+# #         openxlsx::addWorksheet(wb, "Fieldbook")
+# #         openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
+# #         openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+# #         
+#         print("print 2 step: Fieldbook")
+#         
+#         shell.exec(to)
+#       }
+#     })
+#     
+#   }
+#   
+# }) #end observe
+
+observeEvent(input$fieldbook_export_button_doe, function() {
   
-}) #end observe
+ 
+  isolate({
+    
+    cropPath <- cropPath(input$doe_type_crop)
+    print(cropPath(input$doe_type_crop))
+    
+    fr = paste("template_",input$doe_template,".xlsx", sep="")
+    print(fr)
+    file_from <- file.path(cropPath,fr,paste="")
+    print(file_from)
+    #file_from <- "Z:\\hidap\\inst\\hidap\\templates\\potato\\template_PTYL.xlsx"
+    
+    from <- file.path(file_from)
+    #file_to <- "Z:/hidap/inst/hidap/data"
+    folder_to <- folderPath("data")
+    
+    .date <- input$doe_date 
+    begin_date <- unlist(str_split(.date[1],pattern = "-",n = 3))
+    folder_file_name <- paste(begin_date[1],begin_date[2],sep="")#folder where fieldbook goes to    
+    dir_name <- file.path(folder_to,tolower(input$doe_type_crop),folder_file_name,sep = "") #File path of the folder_file 
+    
+    print(dir_name)
+    #dir.create(dir_name)
+    #if(!file.exists(folder_to)) dir.create(dir_name,rec=T)
+    if(!file.exists(dir_name)) dir.create(dir_name,rec=T)
+
+    print(folder_to)
+    
+    #to <- file.path(folder_to, paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+    to <- file.path(dir_name,paste(full_fieldbook_name_reactive(),".xlsx",sep = ""))
+    
+    print(to)
+    #file <- to
+    
+    if(!file.exists(to)){
+      file.copy(from=from,to=to)
+      
+      #         add.date(to, "Minimal", row.label = "Begin date", col.name = "Value",input$doe_date,1)
+      #         add.date(to, "Minimal", row.label = "End date", col.name = "Value",input$doe_date,2)
+      add.vals.to.fb(to = to,col.name = "Value",reactive_value = full_fieldbook_name_reactive(),
+                     input_value= input$doe_date,fb_reactive=.fieldbook_doe())        
+      
+      
+      #add.short.name(to = to,sheetName = "Minimal",row.label = "Short name or Title",col.name = "Value",reactive_value = full_fieldbook_name_reactive())        
+      
+      print("print 1 step: Minimal data")
+      
+      #         wb <- openxlsx::loadWorkbook(to)
+      #         openxlsx::addWorksheet(wb, "Fieldbook")
+      #         openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({.fieldbook_doe()}))
+      #         openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+      #         
+      print("print 2 step: Fieldbook")
+      
+      shell.exec(to)
+    }
+  })
+  
+  
+  
+  
+  
+  
+})
+
+
+
 
 # add.short.name <- function(to,sheetName,row.label,col.name,reactive_value){
 #   wb <- openxlsx::loadWorkbook(to) 
@@ -567,39 +704,203 @@ observe({ #begin observe
 
 add.vals.to.fb <- function(to, col.name, reactive_value,input_value,fb_reactive,germ_list){
   wb <- openxlsx::loadWorkbook(to) 
+  
+  #BEGIN sheet MINIMAL
   data_hidap <- readxl::read_excel(path = to,sheet = "Minimal")
   data_hidap[data_hidap$Factor=="Short name or Title",col.name] <- paste(isolate(reactive_value))
   #openxlsx::writeDataTable(wb,sheet = sheetName,x = data_hidap,colNames = TRUE,withFilter = FALSE)
   #openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+  
+  print("Short Name Pass")
   
   input_val <- input_value
   #wb <- openxlsx::loadWorkbook(to)
   #data_hidap <- readxl::read_excel(path = to,sheet = sheetName)
   data_hidap[data_hidap$Factor=="Begin date",col.name] <- paste(as.character(input_val[1]))
   data_hidap[data_hidap$Factor=="End date",col.name] <- paste(as.character(input_val[2]))
-  openxlsx::writeDataTable(wb,sheet = "Minimal",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+  
+  print("Dates Pass")
+  
+  #geographic information
+  cntry <- input$CNTRY
+  tsites <- input$doe_trialSite %>% gsub("\\s*\\([^\\)]+\\)","",.)
+ 
+  #tsites <- tsites %>% stringr::str_trim(.,side = "both")
+  print(cntry)
+  print(tsites)
+  if(is.null(cntry)){return()}
+  if(is.null(tsites)){return()}
+  if(!is.null(cntry) && !is.null(tsites)){
+  print(data_sites())
+  geodata <- filter_geodata(data_sites = data_sites(),country_input = cntry,trail_site = tsites)
+  print(geodata)
+  data_hidap[data_hidap$Factor=="Site short name",col.name] <- paste(as.character(geodata$SHORTN))
+  data_hidap[data_hidap$Factor=="Agroecological zone",col.name] <- paste(as.character(geodata$AEZ))
+  data_hidap[data_hidap$Factor=="CIP Region",col.name] <- paste(as.character(geodata$CREG))
+  data_hidap[data_hidap$Factor=="Continent",col.name] <- paste(as.character(geodata$CONT))
+  data_hidap[data_hidap$Factor=="Country",col.name] <- paste(as.character(geodata$CNTRY))
+  data_hidap[data_hidap$Factor=="Admin1",col.name] <- paste(as.character(geodata$ADM1))
+  data_hidap[data_hidap$Factor=="Admin2",col.name] <- paste(as.character(geodata$ADM2))
+  data_hidap[data_hidap$Factor=="Admin3",col.name] <- paste(as.character(geodata$ADM3))
+  data_hidap[data_hidap$Factor=="Locality",col.name] <- paste(as.character(geodata$LOCAL))
+  data_hidap[data_hidap$Factor=="Elevation",col.name] <- paste(as.character(geodata$ELEV))
+  data_hidap[data_hidap$Factor=="Latitude",col.name] <- paste(as.character(geodata$LATD))
+  data_hidap[data_hidap$Factor=="Longitude",col.name] <- paste(as.character(geodata$LOND))
+  }##end geographic information
+
+  print("Geographic Information Pass")
+   openxlsx::writeDataTable(wb,sheet = "Minimal",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+  #END MINIMAL
   #openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)
+    print("Minimal Finished")
   
-  ##Material List sheet
-  file1 <- input$doe_germ_inputfile
-  if(is.null(file1)){return()}
-  if(!is.null(file1)){
-  mat_list_sheet <- openxlsx::read.xlsx(xlsxFile = to,sheet = "Material List",colNames = TRUE,skipEmptyRows = TRUE)
-  names_mat_list <- names(mat_list_sheet)
-  germ_list_user<- read.csv(file = file1$datapath,header = TRUE)
-  Numeration <- 1:nrow(germ_list_user)
-  datos <- cbind(Numeration,germ_list_user)
-  names(datos) <- stringr::str_replace_all(string = names(mat_list_sheet),pattern = "\\.",replacement = " ")
-  openxlsx::writeDataTable(wb = wb,sheet = "Material List",x = datos,colNames = TRUE,withFilter = FALSE)
+  
+#BEGIN Sheet Installation
+  expenv <- input$doe_expenv
+  stat_design <- input$design
+  if(is.null(stat_design)){return()}
+  if(!is.null(stat_design)){
+  #declare parameter from statistical des  
+  data_hidap <- readxl::read_excel(path = to,sheet = "Installation")
+  
+      if(stat_design=="RCBD"){
+        sdesign_name <- "Randomized Complete Block Design (RCBD)"
+        nrep <- input$rcbd_r 
+      }  
+      if(stat_design=="CRD"){
+        sdesign_name <- "Completely Randomized Design (CRD)"
+        nrep <- input$crd_r  
+      }      
+      if(stat_design=="LSD"){
+        sdesign_name <- "Latin Square Design (LSD)"
+        nrep <- "" 
+      }      
+      if(stat_design=="ABD"){
+        sdesign_name <- "Augmented Block Desing (ABD)"
+        nrep <- input$abd_r   
+      }
+      if(stat_design=="SPPD"){
+        
+        if(input$sppd_stat_design=="crd"){
+          sdesign_name <- "Split Plot with Plots in CRD (CRD)"
+          nrep <- input$sppd_r        
+        }
+        
+        if(input$sppd_stat_design=="rcbd"){
+        sdesign_name <- "Split Plot with Plots in RCBD (SPRCBD)"
+        nrep <- input$sppd_r        
+        }
+        
+        if(input$sppd_stat_design=="lsd"){
+          sdesign_name <- "Split Plot with Plots in LSD (LSD)"
+          nrep <- input$sppd_r        
+        }
+           
+    }
+  
+  
+  
+  
+
+print("Disenos Pass")
+  
+    data_hidap[data_hidap$Factor=="Experimental design",col.name] <- paste(as.character(sdesign_name))
+    data_hidap[data_hidap$Factor=="Number of repetitions or blocks",col.name] <- paste(as.character(nrep))
+#   data_hidap[data_hidap$Factor=="Experimental design",col.name] <- paste(as.character(stat_design))
+#   data_hidap[data_hidap$Factor=="Number of repetitions or blocks",col.name] <- paste(as.character(input$rcbd_r))
+}
+
+  if(is.null(expenv)){return()} 
+  if(!is.null(expenv)){
+  data_hidap[data_hidap$Factor=="Experimental Environment",col.name] <- paste(as.character(expenv))
   }
-  
+  #openxlsx::writeDataTable(wb,sheet = "Installation",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+  openxlsx::writeDataTable(wb,sheet = "Installation",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+#END INSTALLATION
+
+print("Installation Pass")
+##Sheet Material List sheet
+    file1 <- input$doe_germ_inputfile
+    if(is.null(file1)){return()}
+    if(!is.null(file1)){
+    mat_list_sheet <- openxlsx::read.xlsx(xlsxFile = to,sheet = "Material List",colNames = TRUE,skipEmptyRows = TRUE)
+    ##
+    print(mat_list_sheet)
+    ##
+    names_mat_list <- names(mat_list_sheet)
+    ##
+    print(names_mat_list)
+    ##
+    germ_list_user<- read.csv(file = file1$datapath,header = TRUE)
+    print(germ_list_user)
+    Numeration <- 1:nrow(germ_list_user)
+    print(Numeration)
+    datos <- cbind(Numeration,germ_list_user)
+    print(datos)
+    names(datos) <- stringr::str_replace_all(string = names(mat_list_sheet),pattern = "\\.",replacement = " ")
+    print("final datos Installation")
+    print(datos)
+    openxlsx::writeDataTable(wb = wb,sheet = "Material List",x = datos,colNames = TRUE,withFilter = FALSE)
+    }
+print("Crop Material List")        
+#Sheet Crop_management 
+  rm(data_hidap)
+  data_hidap <- readxl::read_excel(path = to,sheet = "Crop_management")
+  data_hidap[data_hidap[,"Intervention type"]=="Planting","Date"] <- paste(input_val[1])
+  data_hidap[data_hidap[,"Intervention type"]=="Vine cutting / killing","Date"] <- paste(input_val[1])
+  data_hidap[data_hidap[,"Intervention type"]=="Harvest","Date"] <- paste(input_val[1])
+
+  if(input$doe_type_crop=="Potato"){
+     if(!is.null(input$vars_doe_pt)){
+       v_input <- input$vars_doe_pt 
+       v_list <- var_list(crop="Potato")
+       vars <- v_list %in% v_input
+       vars <- names(v_list[vars])
+       #print(vars)
+       vars <- gsub("\\[[^\\]]*\\]: ", "", vars, perl=TRUE)
+       vars <- stringr::str_trim(vars,side = "both")
+       #print(vars)
+      }
+  }
+  if(input$doe_type_crop=="Sweetpotato"){
+      if(!is.null(input$vars_doe_sp)){vars <- input$vars_doe_sp 
+        v_input <- input$vars_doe_pt 
+        v_list <- var_list(crop="Sweetpotato")
+        vars <- v_list %in% v_input
+        vars <- names(v_list[vars])
+        #print(vars)
+        vars <- gsub("\\[[^\\]]*\\]: ", "", vars, perl=TRUE)
+        vars <- stringr::str_trim(vars,side = "both")
+        #print(vars)
+     } 
+  }
+  n_row <- length(vars)
+  col1 <- rep("Measure",n_row)
+  #var <- ddict %>% dplyr::filter(.,ABBR %in% a)
+  col2 <- vars
+  col3 <- rep(as.character(input_val[1]),n_row)
+  col4 <- rep(NA,n_row)
+  col5 <- rep(NA,n_row)
+  col6 <- rep(NA,n_row)
+  col7 <- rep(NA,n_row)
+  col8 <- rep(NA,n_row)
+  col9 <- rep(NA,n_row)
+
+  temp_data <- data.frame(col1,col2,col3,col4,col5,col6,col7,col8,col9)
+  names(temp_data) <- names(data_hidap)
+  data_hidap <- rbind(data_hidap,temp_data)
+  openxlsx::writeDataTable(wb = wb,sheet = "Crop_management",x = data_hidap,colNames = TRUE,withFilter = FALSE)
+      
+print("Crop Management Pass")
+#Sheet Fieldbook      
   openxlsx::addWorksheet(wb, "Fieldbook")
   openxlsx::writeDataTable(wb = wb,sheet = "Fieldbook",x = isolate({fb_reactive}))
   openxlsx::saveWorkbook(wb,file = to, overwrite = TRUE)  
-
+print("Fieldbook Pass")
+shell.exec(to)
 }
 
-
+#print("Fieldbook Pass")
 # observe({
 #   
 # #  if(is.null(input$CNTRY)) {return()}
