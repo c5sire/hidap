@@ -117,16 +117,16 @@ output$ui_doe_par <- renderUI({
   choices <- c("Randomized Complete Block Design" = "RCBD",
                "Completely Randomized Design" = "CRD",
                "Latin Square Design" = "LSD",
-               "Graeco-Latin Design" = "GLD",
-               "Youden Design" = "YD",
-               "Balanced Incomplete Block Design" = "BIB",
-               "Cyclic Design" = "CD",
-               "Lattice Design" = "LD",
-               "Alpha Design" = "AD",
-               "Augmented Block Design" = "ABD",
-               "Augmented Partially Replicated Design" = "APRD",
                "Split-plot Design" = "SPPD",
                "Strip-plot Design" = "STPD",
+               "Augmented Block Design" = "ABD",
+               "Balanced Incomplete Block Design" = "BIBD",
+               "Graeco-Latin Design" = "GLD",
+               #"Youden Design" = "YD",
+               #"Cyclic Design" = "CD",
+               "Lattice Design" = "LD",
+               "Alpha Design" = "AD",
+               "Augmented Partially Replicated Design" = "APRD",
                "Factorial Design" = "F2SPPD"
                )
   selectInput("design", "Design method:", choices, multiple = FALSE)
@@ -247,7 +247,7 @@ wellPanel(style = "background-color: #F5F5DC;",
       conditionalPanel(condition =  "input.design == 'CRD'",
         #radioButtons("r", "r:", 2:9, 2, inline = TRUE)
         wellPanel(
-          selectInput("crd_r", "r:", 2:1000, 3),
+          selectInput("crd_r", "Number of Replication:", 2:1000, 3),
           checkboxInput("crd_first", "Randomize first block", FALSE), 
           checkboxInput("crd_continue", "Use continuous numeration", FALSE) 
         )
@@ -255,7 +255,7 @@ wellPanel(style = "background-color: #F5F5DC;",
       ),
       conditionalPanel(condition =  "input.design == 'RCBD' ", 
         wellPanel(
-        selectInput("rcbd_r", "r:", 2:1000, 3),
+        selectInput("rcbd_r", "Number of Replication:", 2:1000, 3),
         checkboxInput("rcbd_first", "Randomize first block", FALSE), 
         checkboxInput("rcbd_continue", "Use continuous numeration", FALSE) 
        )
@@ -263,7 +263,7 @@ wellPanel(style = "background-color: #F5F5DC;",
 
       conditionalPanel(condition =  "input.design == 'LSD' ",
         wellPanel(                        
-         selectInput("lsd_r", "r:", 2:1000, 3),
+         selectInput("lsd_r", "Number of Replication:", 2:1000, 3),
          checkboxInput("lsd_first", "Randomize first block", FALSE) 
         )
       ),
@@ -271,7 +271,7 @@ wellPanel(style = "background-color: #F5F5DC;",
         conditionalPanel(condition =  "input.design == 'ABD' ", 
 
             wellPanel(
-             selectInput("abd_r", "r:", 2:1000, 3),
+             selectInput("abd_r", "Number of Replication:", 2:1000, 3),
 #              checkboxInput("abd_first", "Randomize first block", FALSE), 
 #              checkboxInput("abd_continue", "Use continuous numeration", FALSE),
              br(),
@@ -293,7 +293,7 @@ wellPanel(style = "background-color: #F5F5DC;",
 #          selectInput("gld_trt2", "Treatment 2 (Germplasm)", get_germplasm_lists() , 
 #                                            multiple = FALSE)
            wellPanel(
-             selectInput("gld_r", "r:", 2:1000, 3),
+             selectInput("gld_r", "Number of Replication:", 2:1000, 3),
 #              checkboxInput("gld_first", "Randomize first block", FALSE), 
 #              checkboxInput("gld_continue", "Use continuous numeration", FALSE),
              br(),
@@ -312,7 +312,7 @@ wellPanel(style = "background-color: #F5F5DC;",
      conditionalPanel(condition = "input.design == 'SPPD'",
           
           wellPanel(
-            selectInput("sppd_r", "r:", 2:1000, 3),
+            selectInput("sppd_r", "Number of Replication:", 2:1000, 3),
             checkboxInput("sppd_first", "Randomize first block", FALSE), 
             checkboxInput("sppd_continue", "Use continuous numeration", FALSE),
             br(),
@@ -332,17 +332,48 @@ wellPanel(style = "background-color: #F5F5DC;",
                      )           
               )   
           )
-          ),
-#    
+      ),
+###
+        conditionalPanel(condition = "input.design == 'STPD'",
+                         
+                   wellPanel(
+                   selectInput("stpd_r", "Number of Replication:", 2:1000, 3),
+                   checkboxInput("stpd_first", "Randomize first block", FALSE), 
+                   checkboxInput("stpd_continue", "Use continuous numeration", FALSE),
+                   br(),
+                           
+                   fluidRow(
+                   column(3,
+                   textInput(inputId = "stpd_factor_name", label = "Additional Factor Name",""),
+                   br(),
+                   textInput(inputId = "stpd_factor_lvl1", label = "First Level for Additional Factor",value = ""),
+                   textInput(inputId = "stpd_factor_lvl2", label = "Second Level for Additional Factor",value = ""),       
+                   textInput(inputId = "stpd_factor_lvl3", label = "Third Level for Additional Factor",value = "")      
+                       )           
+                   )   
+             )
+        ),
+###
+conditionalPanel(condition =  "input.design == 'BIBD' ", 
+                 wellPanel(
+                   selectInput("bibd_r", "Number of Replication:", 2:1000, 3)
+#                    checkboxInput("bibd_first", "Randomize first block", FALSE), 
+#                    checkboxInput("bibd_continue", "Use continuous numeration", FALSE) 
+                 )
+),
+
+
+
+###    
       conditionalPanel(condition =  "input.design == 'YD' ", 
          wellPanel(
            selectInput("yd_r", "r:", 2:11, 2),
            checkboxInput("yd_first", "Randomize first block", TRUE)
          )
       ),
-      conditionalPanel(condition =  "input.design == 'BIB' ", 
-         selectInput("bib_k", "k:", 4:30, 4)
-      ),
+#       conditionalPanel(condition =  "input.design == 'BIB' ", 
+#          selectInput("bib_r", "r:", 4:30, 4)
+#       ),
       conditionalPanel(condition =  "input.design == 'CD' ", 
          selectInput("cd_r", "r:", 6:30, 6)
       ),

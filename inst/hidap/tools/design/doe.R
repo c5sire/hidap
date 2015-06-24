@@ -123,9 +123,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 sppd_r=2, sppd_first=FALSE, sppd_continue=FALSE, 
                 sppd_stat_design="rcbd",sppd_factor_lvl1="level1",sppd_factor_lvl2="level2",sppd_factor_lvl3="level3",
                 
+                stpd_r=2, stpd_first=FALSE, stpd_continue=FALSE, 
+                stpd_factor_lvl1="level1",stpd_factor_lvl2="level2",stpd_factor_lvl3="level3",
+                
+                bib_r= 3,
                 
                 yd_r = 2, yd_first = FALSE,
-                bib_k=4,
+               
                 cd_k = 2, cd_r = 6,
                 ld_r = 2,
                 ad_r = 2, ad_k = 2
@@ -157,15 +161,6 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     first <- as.logical(lsd_first)
   }
  
-  
-#   if((design=="ABD")){
-#     trt2 <- get_germplasm_ids(abd_trt2)
-#     r <- as.integer(abd_r)
-#     first <- as.logical(abd_first)
-#     #     continue <- as.logical(abd_continue)
-#   }
-  
-
   if(design == "ABD"){
 #     trt <- trt2
 #     trt2 <- trt
@@ -193,24 +188,46 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     trt2 <- trt2[!is.na(trt2) & trt2!=""]
     print(trt2)
   }
-
+###
+  if(design == "STPD"){
+      r <- as.integer(stpd_r)
+      first <- as.logical(stpd_first)
+      continue <- as.logical(stpd_continue) 
+      #     
+      stpd_factor_lvl1 <- stpd_factor_lvl1 %>% as.character() %>% str_trim(.,side = "both")
+      stpd_factor_lvl2 <- stpd_factor_lvl2 %>% as.character() %>% str_trim(.,side = "both")
+      stpd_factor_lvl3 <- stpd_factor_lvl3 %>% as.character() %>% str_trim(.,side = "both")
+      print(stpd_factor_lvl1)
+      print(stpd_factor_lvl2)
+      print(stpd_factor_lvl3)
+      trt2 <- c(stpd_factor_lvl1,stpd_factor_lvl2,stpd_factor_lvl3)
+      print(trt2)
+      trt2 <- trt2[!is.na(trt2) & trt2!=""]
+      print(trt2)
+    }
+  
+  if(design == "BIBD"){
+    r <- as.integer(bib_r)  
+  }
+###
   if(design == "GLD"){
     trt2 <- get_germplasm_ids(gld_trt2)
   }
+
   if(design == "YD"){
     r <- as.integer(yd_r) 
     first <- as.logical(yd_first)
   }
-  if(design == "BIB"){
-    k <- as.integer(bib_k)  
-  }
+
   if(design == "CD"){
     k <- as.integer(cd_k)  
     r <- as.integer(cd_r)
   }
+
   if(design == "LD"){
     r <- as.integer(ld_r)
   }
+
   if(design == "AD"){
     k <- as.integer(ad_k)  
     r <- as.integer(ad_r)
@@ -236,7 +253,6 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     out <- design_lsd(trt, serie, seed, kinds)
   }
 
-
   if(design == "ABD"){ #trt2::genotypes & trt:: genotypes
   out <- design_abd(trt2,trt, r, serie, seed, kinds)
   }
@@ -248,13 +264,25 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   if(design == "SPPD"){
     out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds, first)
   }
- 
+
+  if(design == "STPD"){
+    print(trt)
+    print(trt2)
+    print(r)
+    print(serie)
+    print(seed)
+    print(kinds)
+    #out <- design_split(trt, trt2, r, serie, seed, kinds)
+    print(out)
+    out <- design.strip(trt, trt2, r, serie, seed, kinds)
+  }
+   
   if(design == "YD"){
     out <- design_yd(trt, r, serie, seed, kinds, first)
   }
 
-  if(design == "BIB"){
-    out <- design_bib(trt, k, serie, seed, kinds)
+  if(design == "BIBD"){
+    out <- design_bib(trt, r, serie, seed, kinds)
   }
 
   if(design == "CD"){
@@ -272,13 +300,10 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 #     out <- design.dau(trt2, trt, r, serie, seed, kinds, name)
 #   }
 
-  if(design == "STPD"){
-    out <- design.strip(trt, trt2, r, serie, seed, kinds)
-  }
-  
-  if(design == "AB"){
+  if(design == "F2SPPD"){ ##Factorial De
     out <- design.ab(trt, r, serie, sub_design, seed, kinds, first)
   }
+
 
   if(design == "APRD"){
     out <- design_aprd(trt, trt2, frac, r, serie, seed, kinds)
@@ -334,7 +359,7 @@ summary.doe <- function(object, ...){
                               "LD", "ALPHA", "ABD", "SPPD", "STPD", "F2SPPD" )){
     cat("r:", p$r, "\n")  
   }
-  if(toupper(p$design) %in% c("BIB","CYCLIC", "ALPHA" )){
+  if(toupper(p$design) %in% c("BIBD","CYCLIC", "ALPHA" )){
     cat("k:", p$k, "\n")  
   }
   if(toupper(p$design) %in% c("RCBD", "YOUDEN", "SPPD", "F2SPPD" )){
@@ -393,20 +418,26 @@ fieldbook.doe <- function(object, ...){
       fieldbook <-  fieldbook[,c(1,3,5,4)]
       names(fieldbook) <- c("PLOT","REP","FACTOR","INSTN") #column block
     }
-    
     if(input$sppd_stat_design=="rcbd"){
       fieldbook <-  fieldbook[,c(1,3,5,4)]
       names(fieldbook) <- c("PLOT","REP","FACTOR","INSTN") #column block
     }    
-    
-    
     if(input$sppd_stat_design=="lsd"){
     fieldbook <-  fieldbook[,c(1,3,4,6,5)]
     names(fieldbook) <- c("PLOT","REP","CBLOCK","FACTOR","INSTN") #column block
     }
-    
             
   }
+  if(input$design=="STPD"){
+    fieldbook <-  fieldbook[,c(1,2,4,3)]
+    names(fieldbook) <- c("PLOT","REP","FACTOR","INSTN")
+    
+  }
+  if(input$design=="BIBD"){
+    names(fieldbook) <- c("PLOT","REP","INSTN") 
+  }
+  
+  
   print("fb after")
   print(head(fieldbook)) 
    
@@ -674,11 +705,7 @@ observeEvent(input$fieldbook_export_button_doe, function() {
     }
   })
   
-  
-  
-  
-  
-  
+ 
 })
 
 
@@ -796,11 +823,16 @@ add.vals.to.fb <- function(to, col.name, reactive_value,input_value,fb_reactive,
           nrep <- input$sppd_r        
         }
            
-    }
-  
-  
-  
-  
+    }     
+      if(stat_design=="STPD"){
+          #sdesign_name <- "Strip Plot Design (STPD)"
+          sdesign_name <- "Strip Plot Design (STRIP)"
+          nrep <- input$stpd_r           
+      }
+      if(stat_design=="BIBD"){
+        sdesign_name <- "Balanced Incomplete Block Design (BIBD)"
+        nrep <- input$bibd_r       
+      } 
 
 print("Disenos Pass")
   

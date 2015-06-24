@@ -85,6 +85,19 @@ design_ad <- function(trt, k, r, ...){
   out
 }
 
+design_split <- function(trt, trt2, r, serie, seed, kinds){
+  
+  #en augmented block design trt:: checks & trt2::genotypes
+  n = length(trt)
+  if(n < 3 | n > 900000000000000000000) stop("The number of treatments in Strip Plot Design must be >2")
+  
+  n=length(trt2)
+  if(n==0) stop("The factor must have at least 1 level")
+  design.split(trt, trt2, r, serie, seed, kinds)
+}
+
+
+
 # design_aprd <- function(trt1, trt2, frac = 0.3, r=2, ... 
 #                         ){
 #   stopifnot(is.numeric(frac))
