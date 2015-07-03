@@ -12,11 +12,14 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
   tabPanel("Data", withMathJax(), uiOutput('ui_data')),
   #tabPanel("Data", uiOutput('ui_data')),
   navbarMenu("Analysis",
+             tabPanel("ANOVA"),
+             tabPanel("MET-MultiEnviormental Analysis Trial"),
+             tabPanel("Principal Component Analysis"),
              tabPanel("Single mean", uiOutput("single_mean")),
              tabPanel("GWAS", uiOutput("ui_gwas"))
              
   ),
-   
+    
   navbarMenu("R",
     tabPanel("Report", uiOutput("report")),
     tabPanel("Code", uiOutput("rcode"))

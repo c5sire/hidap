@@ -333,7 +333,14 @@ output$ui_datasets <- renderUI({
   # Drop-down selection of data set
   tagList(
     selectInput(inputId = "dataset", label = "Datasets:", choices = r_data$datasetlist,
-      selected = state_init("dataset"), multiple = FALSE)#,
+      selected = state_init("dataset"), multiple = FALSE),#
+    
+#     selectInput(inputId = "dataset1", label = "Datasets1:", choices = r_data$datasetlist,
+#                 selected = state_init("dataset"), multiple = FALSE)#,
+    
+    shiny::fileInput(inputId = "view_vars_input",label ="Select your fieldbook" ,accept = c(".xlsx",".xls"))  
+    
+    
 #     conditionalPanel(condition = "input.datatabs == 'Manage'",
 #       checkboxInput("man_add_descr","Add/edit data description", FALSE),
 #       conditionalPanel(condition = "input.man_add_descr == true",

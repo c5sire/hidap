@@ -11,15 +11,27 @@ output$show_filter <- renderUI({
 })
 
 
-output$tabed_doe <- renderRHandsontable({
-  DF <- .getdata()#.fieldbook_doe()
-  #if (!is.null(input$tabed_doe)) {
-  #setHot(DF)
-  rhandsontable(DF) %>%
-    hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
-    hot_cols( fixedColumnsLeft = 3)
-  #}
-})
+# output$tabed_doe <- renderRHandsontable({
+#   DF <- .getdata()#.fieldbook_doe()
+#   #if (!is.null(input$tabed_doe)) {
+#   #setHot(DF)
+#   rhandsontable(DF) %>%
+#     hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
+#     hot_cols( fixedColumnsLeft = 3)
+#   #}
+#   ######################
+#   DF = data.frame(val = 1:10, bool = TRUE, big = LETTERS[1:10],
+#                   small = letters[1:10],
+#                   dt = seq(from = Sys.Date(), by = "days", length.out = 10),
+#                   stringsAsFactors = F)
+#   
+#   rhandsontable(DF, rowHeaders = NULL)
+#   
+#   
+#   
+#   
+#   ###################
+# })
 
 output$ui_filter_error <- renderUI({
   if(is_empty(r_data$filter_error)) return()
@@ -44,7 +56,7 @@ output$ui_data <- renderUI({
               returnTextAreaInput("data_filter", label = "", value = state_init("data_filter")),
               uiOutput("ui_filter_error")))
         ),
-        conditionalPanel("input.datatabs == 'Manage'", uiOutput("ui_Manage")),
+        #conditionalPanel("input.datatabs == 'Manage'", uiOutput("ui_Manage")),
         conditionalPanel("input.datatabs == 'View'",uiOutput("ui_View")),
         #conditionalPanel("input.datatabs == 'Edit'",uiOutput("ui_Edit")),
         conditionalPanel("input.datatabs == 'Visualize'", uiOutput("ui_Visualize")),
@@ -67,7 +79,8 @@ output$datatabs <- renderUI({
       conditionalPanel("input.man_add_descr == false", uiOutput("dataDescriptionHTML")),
       conditionalPanel("input.man_add_descr == true", uiOutput("dataDescriptionMD"))),
     tabPanel("View", dataTableOutput("dataviewer")),
-    tabPanel("Edit", rHandsontableOutput("tabed_doe")),
+    #tabPanel("View", tableOutput("dataviewer")),
+    #tabPanel("Edit", rHandsontableOutput("tabed_doe")),
     tabPanel("Visualize",plotOutput("visualize", width = "100%", height = "100%")),
     tabPanel("Pivot", rpivotTable::rpivotTableOutput("pivotData")),
     tabPanel("Explore", verbatimTextOutput("expl_summary"), plotOutput("expl_plots", width = "100%", height = "100%"))#,

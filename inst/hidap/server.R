@@ -23,13 +23,16 @@ shinyServer(function(input, output, session) {
 
 	# source data & analysis tools
   for(file in list.files(c("tools/app","tools/data", "tools/analysis", 
-                           "tools/design", "tools/dashboard"),
+                           "tools/design", "tools/dashboard","tools/utils"),
       pattern="\\.(r|R)$",
       full.names = TRUE)) {
 
   	source(file, local = TRUE)
   }
-
+  
+  
+  
+  #print(getwd())
   # save state on refresh or browser close
   saveStateOnRefresh(session)
 })

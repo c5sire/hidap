@@ -212,26 +212,26 @@ wellPanel(style = "background-color: #F5F5DC;",
     
     ), 
     
-    
-    wellPanel(
-      h4("Define Genotypes",style = "font-family: 'Arial', cursive;
-        font-weight: 500; line-height: 1.1; 
-        color: #4d3a7d;"),
-      br(),
-      
-      fluidRow(
-        column(3,
-             tags$textarea(id="doe_germ_txtarea", rows="10", style="width:300px;", "")),
-      br(),
-      
-        column(6,offset = 3,
-            fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
-            #tableOutput("doe_germ_table")
-            tableOutput("doe_germ_table")
-            
-            )
-      )
-  ),
+#     
+#     wellPanel(
+#       h4("Define Genotypes",style = "font-family: 'Arial', cursive;
+#         font-weight: 500; line-height: 1.1; 
+#         color: #4d3a7d;"),
+#       br(),
+#       
+#       fluidRow(
+#         column(3,
+#              tags$textarea(id="doe_germ_txtarea", rows="3", style="width:300px;", "")),
+#       br(),
+#       
+#         column(6,offset = 3,
+#             fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
+#             #tableOutput("doe_germ_table")
+#             tableOutput("doe_germ_table")
+#             
+#             )
+#       )
+#   ),
     
     
     wellPanel(
@@ -449,16 +449,45 @@ conditionalPanel(condition =  "input.design == 'BIBD' ",
 #          selectInput("ad_k", "k:", 2:30, 2)
 #       )
        
-    )
+    ),
     
       #     ,
 #     help_and_report(modal_title = 'Experimental design', fun_name = 'doe',
 #                     help_file = inclMD(file.path("..",app_dir,"tools","help",
 #                                                  "my_analysis.md"))
 #     )
+
+
+    
+    wellPanel(
+      h4("Define Genotypes",style = "font-family: 'Arial', cursive;
+        font-weight: 500; line-height: 1.1; 
+        color: #4d3a7d;"),
+      br(),
+      
+      fluidRow(
+        column(3,
+             tags$textarea(id="doe_germ_txtarea", rows="3", style="width:300px;", "")),
+      br(),
+      
+        column(6,offset = 3,
+            fileInput(inputId = "doe_germ_inputfile",label = "Genotypes list"),
+            #tableOutput("doe_germ_table")
+            tableOutput("doe_germ_table")
+            
+            )
+      )
+  )
+
+
+
+
+
+
 #END tagList
   )
 })
+
 
 
 output$fb_variables_doe <- renderUI({
@@ -516,7 +545,7 @@ wellPanel(style = "background-color: #99CC99 ;",
 })
 
 
-# output$tabed_doe <- renderRHandsontable({
+# output$tabed_doe <- renderRHandsontable({ #antiguo
 #   DF <- .getdata()#.fieldbook_doe()
 #   #if (!is.null(input$tabed_doe)) {
 #   #setHot(DF)
@@ -525,6 +554,30 @@ wellPanel(style = "background-color: #99CC99 ;",
 #     hot_cols( fixedColumnsLeft = 3)
 #   #}
 # })
+
+
+# output$tabed_doe <- renderRHandsontable({ #nuevo
+#   #   DF <- .getdata()#.fieldbook_doe()
+#   #   #if (!is.null(input$tabed_doe)) {
+#   #   #setHot(DF)
+#   #   rhandsontable(DF) %>%
+#   #     hot_table(highlightCol = TRUE, highlightRow = TRUE ) %>%
+#   #     hot_cols( fixedColumnsLeft = 3)
+#   #}
+#   ######################
+#   DF = data.frame(val = 1:10, bool = TRUE, big = LETTERS[1:10],
+#                   small = letters[1:10],
+#                   dt = seq(from = Sys.Date(), by = "days", length.out = 10),
+#                   stringsAsFactors = F)
+#   
+#   rhandsontable(DF, rowHeaders = NULL)
+#   
+#   
+#   
+#   
+#   ###################
+# })
+
 
 
 output$doe <- renderUI({
