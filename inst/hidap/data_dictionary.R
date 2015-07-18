@@ -34,5 +34,5 @@ cropvars <- cropvars$VAR
 
 #Mas adelante usare el argumento "trial" para separar por trials
 
-#data_dictionary(fp, crop = "potato",trial="yield)
-#data_dictionary(fp, crop = "sweetpotato",trial="yield)
+#data_dictionary(fp, crop = "potato",trial="yield")
+#data_dictionary(fp, crop = "sweetpotato",trial="yield")
