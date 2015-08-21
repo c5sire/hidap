@@ -182,6 +182,9 @@ output$options_doe <- renderUI({
 #                            selected = c("SPYL"), multiple = FALSE)    
 #         
 #       ),
+     selectInput(inputId = "doe_phase_exp",label = "Phase of the experiment", choices = ""),
+
+
      selectInput(inputId = "doe_template",label = "Type of Trial (Template)", choices = ""),
                  
       
@@ -248,7 +251,7 @@ wellPanel(style = "background-color: #F5F5DC;",
         #radioButtons("r", "r:", 2:9, 2, inline = TRUE)
         wellPanel(
           selectInput("crd_r", "Number of Replication:", 2:1000, 3),
-          checkboxInput("crd_first", "Randomize first block", FALSE), 
+          #checkboxInput("crd_first", "Randomize first block", FALSE), 
           checkboxInput("crd_continue", "Use continuous numeration", FALSE) 
         )
         
@@ -256,15 +259,15 @@ wellPanel(style = "background-color: #F5F5DC;",
       conditionalPanel(condition =  "input.design == 'RCBD' ", 
         wellPanel(
         selectInput("rcbd_r", "Number of Replication:", 2:1000, 3),
-        checkboxInput("rcbd_first", "Randomize first block", FALSE), 
+        #checkboxInput("rcbd_first", "Randomize first block", FALSE), 
         checkboxInput("rcbd_continue", "Use continuous numeration", FALSE) 
        )
       ),
 
       conditionalPanel(condition =  "input.design == 'LSD' ",
         wellPanel(                        
-         selectInput("lsd_r", "Number of Replication:", 2:1000, 3),
-         checkboxInput("lsd_first", "Randomize first block", FALSE) 
+         selectInput("lsd_r", "Number of Replication:", 2:1000, 3)#,
+         #checkboxInput("lsd_first", "Randomize first block", FALSE) 
         )
       ),
       
@@ -313,7 +316,7 @@ wellPanel(style = "background-color: #F5F5DC;",
           
           wellPanel(
             selectInput("sppd_r", "Number of Replication:", 2:1000, 3),
-            checkboxInput("sppd_first", "Randomize first block", FALSE), 
+            #checkboxInput("sppd_first", "Randomize first block", FALSE), 
             checkboxInput("sppd_continue", "Use continuous numeration", FALSE),
             br(),
             
@@ -338,7 +341,7 @@ wellPanel(style = "background-color: #F5F5DC;",
                          
                    wellPanel(
                    selectInput("stpd_r", "Number of Replication:", 2:1000, 3),
-                   checkboxInput("stpd_first", "Randomize first block", FALSE), 
+                   #checkboxInput("stpd_first", "Randomize first block", FALSE), 
                    checkboxInput("stpd_continue", "Use continuous numeration", FALSE),
                    br(),
                            
@@ -367,8 +370,8 @@ conditionalPanel(condition =  "input.design == 'BIBD' ",
 ###    
       conditionalPanel(condition =  "input.design == 'YD' ", 
          wellPanel(
-           selectInput("yd_r", "r:", 2:11, 2),
-           checkboxInput("yd_first", "Randomize first block", TRUE)
+           selectInput("yd_r", "r:", 2:11, 2)#,
+           #checkboxInput("yd_first", "Randomize first block", TRUE)
          )
       ),
 #       conditionalPanel(condition =  "input.design == 'BIB' ", 
@@ -590,14 +593,22 @@ output$doe <- renderUI({
     mainPanel(
       tabsetPanel(
         id = "tabs_doe",
+        type = "tabs", 
         
-        tabPanel("Options", uiOutput("options_doe"),icon = icon("fa fa-file-excel-o fa-2x"))
-        ,
+#         tabPanel("Options", uiOutput("options_doe"),icon = icon("fa fa-file-excel-o fa-2x"))
+#         ,
+        tabPanel("Options", uiOutput("options_doe"),icon = icon("fa fa-file-excel-o fa-2x"),
+                 HTML("<div id='fboptions'><FORM><INPUT Type='BUTTON' VALUE='Next'></FORM></div>")
+                 ),
 #         withProgress(message = 'Creating fieldbook', value = 0.1, {
 #           tabPanel("Summary", verbatimTextOutput("summary_doe"))
 #         })  ,
          
-        tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"),icon = icon("fa fa-building-o fa-2x")), 
+        #tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"),icon = icon("fa fa-building-o fa-2x")), 
+       tabPanel("Fieldbook Variables", uiOutput("fb_variables_doe"),icon = icon("fa fa-building-o fa-2x"),
+                HTML("<div id='fbvariables'><FORM><INPUT Type='BUTTON' VALUE='Next'></FORM></div>")                
+                ),
+
         withProgress(message = 'Creating fieldbook', value = 0.1, {  
 
         tabPanel("Fielbook draft", 
@@ -608,17 +619,20 @@ output$doe <- renderUI({
                  icon = icon("fa fa-table fa-2x")
                
              )
-
-#         tabPanel("Fielbook draft", dataTableOutput("fieldbook_doe"),icon = icon("fa fa-table fa-2x"))
-
-          
-        })
+        }),
          
 #         tabPanel("Table edit", rHandsontableOutput("tabed_doe"))
         
         #,
         #tabPanel("Plot", plotOutput("plot_my_analysis", height = "100%"))
-     
+        tags$script("$('#fboptions').click(function() {
+                            tabs = $('.tabbable .nav.nav-tabs li a');
+                            $(tabs[1]).click();
+                            })"),
+        tags$script("$('#fbvariables').click(function() {
+                            tabs = $('.tabbable .nav.nav-tabs li a');
+                            $(tabs[2]).click();
+                })")
 
 
       )

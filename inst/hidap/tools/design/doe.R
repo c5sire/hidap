@@ -108,27 +108,34 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
                 serie = 1, zigzag = TRUE,
                 seed = 0, kinds = "Super-Duper", 
                 
-                crd_r=2 , crd_first = FALSE, crd_continue = FALSE,
-                rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
+                #crd_r=2 , crd_first = FALSE, crd_continue = FALSE,
+                crd_r=2 ,crd_continue = FALSE,
+                #rcbd_r=2, rcbd_first = FALSE, rcbd_continue = FALSE,
+                rcbd_r=2, rcbd_continue = FALSE,
                                     
-                lsd_r=2, lsd_first = FALSE,
+                #lsd_r=2, lsd_first = FALSE,
+                lsd_r=2, 
                 #abd_r=2, abd_first =FALSE, abd_continue = FALSE, 
                 #abd_r=2, #abd_first =FALSE
 
-                abd_trt2= "A", abd_r=2, abd_first =FALSE, abd_continue = FALSE, #to run an example
+                #abd_trt2= "A", abd_r=2, abd_first =FALSE, abd_continue = FALSE, #to run an example
+                abd_trt2= "A", abd_r=2, abd_continue = FALSE,
                 #abd_r=2, abd_first =FALSE, abd_continue = FALSE,
                 
                 gld_trt2 = "A",
                 
-                sppd_r=2, sppd_first=FALSE, sppd_continue=FALSE, 
+                sppd_r=2, sppd_continue=FALSE,
+                #sppd_r=2, sppd_first=FALSE, sppd_continue=FALSE, 
                 sppd_stat_design="rcbd",sppd_factor_lvl1="level1",sppd_factor_lvl2="level2",sppd_factor_lvl3="level3",
                 
-                stpd_r=2, stpd_first=FALSE, stpd_continue=FALSE, 
+                #stpd_r=2, stpd_first=FALSE, stpd_continue=FALSE, 
+                stpd_r=2, stpd_continue=FALSE, 
                 stpd_factor_lvl1="level1",stpd_factor_lvl2="level2",stpd_factor_lvl3="level3",
                 
                 bib_r= 3,
                 
-                yd_r = 2, yd_first = FALSE,
+                #yd_r = 2, yd_first = FALSE,
+                yd_r = 2,
                
                 cd_k = 2, cd_r = 6,
                 ld_r = 2,
@@ -148,17 +155,17 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   
   if(design == "RCBD"){
     r <- as.integer(rcbd_r) 
-    first <- as.logical(rcbd_first)
+    #first <- as.logical(rcbd_first)
     continue <- as.logical(rcbd_continue)
   }
   if(design == "CRD"){
     r <- as.integer(crd_r)
-    first <- as.logical(crd_first)
+    #first <- as.logical(crd_first)
     continue <- as.logical(crd_continue)
   }
   if(design == "LSD"){
-    #r <- as.integer(lsd_r) 
-    first <- as.logical(lsd_first)
+    r <- as.integer(lsd_r) 
+    #first <- as.logical(lsd_first)
   }
  
   if(design == "ABD"){
@@ -167,13 +174,13 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
     trt2 <- genochecks()
     r <- as.integer(abd_r)
     #trt2 <- get_germplasm_ids(abd_trt2)
-    first <- as.logical(abd_first)
+    #first <- as.logical(abd_first)
     continue <- as.logical(abd_continue)
   }
   
   if(design == "SPPD"){
     r <- as.integer(sppd_r)
-    first <- as.logical(sppd_first)
+    #first <- as.logical(sppd_first)
     continue <- as.logical(sppd_continue) 
 #     
     sub_design <- as.character(sppd_stat_design)
@@ -191,7 +198,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 ###
   if(design == "STPD"){
       r <- as.integer(stpd_r)
-      first <- as.logical(stpd_first)
+      #first <- as.logical(stpd_first)
       continue <- as.logical(stpd_continue) 
       #     
       stpd_factor_lvl1 <- stpd_factor_lvl1 %>% as.character() %>% str_trim(.,side = "both")
@@ -216,7 +223,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 
   if(design == "YD"){
     r <- as.integer(yd_r) 
-    first <- as.logical(yd_first)
+    #first <- as.logical(yd_first)
   }
 
   if(design == "CD"){
@@ -246,11 +253,12 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
   
   if(design == "RCBD"){
-    out <- design_rcbd(trt, r, serie, seed, kinds, first, continue)
+    out <- design_rcbd(trt, r, serie, seed, kinds, first = TRUE, continue)
+    #out <- design_rcbd(trt, r, serie, seed, kinds, first, continue)
   }
   
   if(design == "LSD"){
-    out <- design_lsd(trt, serie, seed, kinds)
+    out <- design_lsd(trt, serie, seed, kinds, first=TRUE)
   }
 
   if(design == "ABD"){ #trt2::genotypes & trt:: genotypes
@@ -262,7 +270,8 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
   }
 
   if(design == "SPPD"){
-    out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds, first)
+    #out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds, first)
+    out <- design.split(trt, trt2, r, sub_design, serie, seed, kinds ,first = TRUE)
   }
 
   if(design == "STPD"){
@@ -301,7 +310,7 @@ doe <- function(design = "RCBD",# "CRD", "LSD", "GLD","YD","BIB",
 #   }
 
   if(design == "F2SPPD"){ ##Factorial De
-    out <- design.ab(trt, r, serie, sub_design, seed, kinds, first)
+    out <- design.ab(trt, r, serie, sub_design, seed, kinds, first=FALSE)
   }
 
 
@@ -647,7 +656,7 @@ output$doe_genochecks_table <- renderTable({
 
 observeEvent(input$fieldbook_export_button_doe, function() {
   
- 
+  
   isolate({
     
     cropPath <- cropPath(input$doe_type_crop)

@@ -57,6 +57,126 @@ cropPath = function(getCurrentCrop){
 
 
 
+####################
+
+trait_type <- function(trait,datadict)
+{
+  tp <- as.character(datadict[datadict$ABBR==trait,c("TYPE")]) 
+  stringr::str_trim(tp,side="both")
+  #   if(tp=="Continuous" || tp=="Discrete"){
+  #   #tp <- "quantitative"   
+  #   tp <- tp
+  #   }
+  #   if(tp=="Categorical"){
+  #   #tp <- "categorical"  
+  #   tp <- tp
+  #     }
+  if(is.na(tp)){
+    tp <- "Continuous"
+  }
+  return(tp)
+}
+
+scale_trait <- function(trait,datadict){
+  
+  tp <- trait_type(trait = trait,datadict = datadict)
+  
+  if(tp=="Continuous"||tp=="Discrete"){
+    
+    ll <- as.numeric(datadict[datadict$ABBR==trait,c("LOWER")])
+    ul <- as.numeric(datadict[datadict$ABBR==trait,c("UPPER")])
+    output <- list(ll=ll,ul=ul)
+  }
+  
+  if(tp=="Categorical"){
+    cat_scale <- datadict[datadict$ABBR == trait, c("CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10")]
+    pattern <- "= .*$"
+    cat_scale <- gsub(pattern=pattern,replacement = "",x = cat_scale)
+    cat_scale <- suppressWarnings(as.numeric(cat_scale))
+    cat_scale <- as.numeric(stringr::str_trim(cat_scale[!is.na(cat_scale)],side="both"))
+    output <- list(cat_scale=cat_scale)
+  }
+  
+  invisible(output)
+  
+}
+
+
+conditionalformat_trait <- function(fp,trait,datadict){ 
+  
+  wb <- openxlsx::loadWorkbook(fp)
+  fieldbook <- readxl::read_excel(fp,sheet = "Fieldbook")
+  fieldbook <- as.data.frame(fieldbook)
+  sheet <- "Fieldbook"  
+  # flag=TRUE #quantitative
+  tp <- trait_type(trait=trait,datadict=datadict)
+  out <-scale_trait(trait=trait,datadict=datadict) 
+  print(trait)
+  col_trait <- fieldbook[,trait]
+  col_number <- which(names(fieldbook)==trait)
+  nc <- nrow(fieldbook)+1
+  
+  negStyle <- openxlsx::createStyle(fontColour = "#9C0006", bgFill = "#FFC7CE")
+  posStyle <- openxlsx::createStyle(fontColour = "#006100", bgFill = "#C6EFCE")
+  
+  if(tp == "Continuous"|| tp == "Discrete"){
+    print(out$ll)
+    print(out$ul)
+    #       openxlsx::conditionalFormatting(wb, sheet = sheet, cols=col_number, rows=2:nc, rule = sprintf("<%s", out$ul), style = posStyle)#OK
+    #       openxlsx::conditionalFormatting(wb, sheet = sheet, cols=col_number, rows=2:nc, rule = sprintf(">%s", out$ll), style = posStyle)#OK
+    openxlsx::conditionalFormatting(wb, sheet = sheet, cols=col_number, rows=2:nc, rule=sprintf(">%s", out$ul), style = negStyle)#WRONG
+    openxlsx::conditionalFormatting(wb, sheet = sheet, cols=col_number, rows=2:nc, rule=sprintf("<%s", out$ll), style = negStyle)#WRONG
+    openxlsx::conditionalFormatting(wb, sheet = sheet, cols = col_number, rows = 2:nc, rule = c(out$ll,out$ul), style = posStyle,type = "between" )
+  } 
+  
+  if(tp =="Categorical"){
+    
+    print(out$cat_scale)
+    out_values <- col_trait[!is.element(el = col_trait,set = out$cat_scale)]
+    print("ok")
+    print("out_values")
+    for(i in out_values)
+      openxlsx::conditionalFormatting(wb, sheet = sheet, cols = col_number, rows = 2:nc, rule = sprintf("==%s", i),style = negStyle)     
+  }
+  
+  
+  openxlsx::saveWorkbook(wb,file = fp,overwrite = TRUE)
+}
+
+
+
+conditionalFormat_cipnumber <- function(fp,sheetName,cip_colname="INSTN"){
+  wb <- openxlsx::loadWorkbook(fp)
+  book <- readxl::read_excel(path = fp,sheet=sheetName)
+  book <- as.data.frame(book)
+  sheet <- sheetName
+  nc <- nrow(book)+1
+  col_number <- which(names(book)==cip_colname)
+  a <- sbformula::cip_number_check(book[,cip_colname])
+  cipwrong <- a$cipnumber_wrong
+  if(length(cipwrong)>0){
+    regla <-  unique(cipwrong)
+    print(regla)
+    for(i in regla){
+      openxlsx::conditionalFormatting(wb, sheet = sheet, cols = col_number, rows = 2:nc, type = "contains", rule = i )
+    }
+    openxlsx::saveWorkbook(wb,file = fp,overwrite = TRUE)
+  }
+}
+
+
+get.fb.param <-function(fp,sheet,param){
+  params <- readxl::read_excel(path = fp, sheet = sheet)
+  params <- as.data.frame(params)
+  lapply(x <- 1:ncol(params), function(x)  params[,x]<-as.character(params[,x]))
+  #for(i in 1:ncol(params)) params[,i]<-as.character(params[,i])
+  params[params$Factor==param,2]
+}
+
+
+
+
+#get.fb.param(fp,"Installation","Experimental design")
 # 
 # cropResourcePath <- function(type="data",crop){
 #   #path = getBaseDir()

@@ -79,13 +79,16 @@ output$ui_View <- renderUI({
      #uiOutput("dependent"),
     #uiOutput("independents"),
     tags$hr(),
-    uiOutput('ui.action'), # instead of conditionalPanel
+    uiOutput('ui.action'), 
+    uiOutput('ui.exportfb.action'),
+    #print(output$ui.action),# instead of conditionalPanel
     tags$hr(),
     #uiOutput("independents"),
     #tags$hr(),
 #     uiOutput("ui_action_sum"), 
 #     tags$hr(),
-    help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
+    #help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md"))) 'Fieldbook'=='View'
+    help_modal('Fieldbook','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
 )})
 
 fb_data <- reactive({
@@ -95,7 +98,13 @@ fb_data <- reactive({
 #   print(input$view_vars)
   #fb_file <- input$view_vars
   fb_file <- input$view_vars_input
-  #   print("---2---")
+  #print(fb_file)
+  #str(fb_file)
+  #print(fb_file$name)
+  folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
+  print(folder_file)
+  
+#   print("---2---")
 #   print(input$view_vars)
 #   print("---3---")
 #   print(fb_file)
@@ -103,6 +112,9 @@ fb_data <- reactive({
   #if(!is.null(fb_file)){
   if(is.null(input$view_vars_input)){return()}
   if(!is.null(fb_file)){
+    #t <- paste(fb_file$datapath, ".xlsx", sep="")
+    #str(t)
+    #print(t)
     file.copy(fb_file$datapath,paste(fb_file$datapath, ".xlsx", sep=""))
     
     #fb_data <- read_excel(paste(fb_file$datapath, ".xlsx", sep=""), sheet = "Fieldbook")
@@ -117,6 +129,7 @@ fb_data <- reactive({
     plant_den <- as.numeric(inst[stringr::str_detect(inst$Factor,"Planting density"),"Value"])
       
     fb_data <-  sbformula::sbcalculate(fb = fieldbook, plot.size = plot_size,plant.den = plant_den)   
+    #save(fb_data,file = "fieldbook.Rdata")
     fb_data
     
   #fb_data <- readxl::read_excel(fb_file <- paste(fb_file$datapath,".xls",sep = "") ,sheet = "Fieldbook")
@@ -125,8 +138,92 @@ fb_data <- reactive({
 
 output$ui.action <- renderUI({
   if (is.null(fb_data())) return()
-  actionButton("action", "Calculate your Fieldbook Variables")
+  actionButton("action", "Process your Fieldbook")
 })
+
+output$ui.exportfb.action <- renderUI({
+  if (is.null(summary_dframe())) return()
+  actionButton("exportfb_button", "Export Fieldbook")
+})
+
+shiny::observeEvent(input$exportfb_button, function(){
+  isolate({ 
+    #fp <-  "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
+    fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
+    
+    
+    fb_file <- input$view_vars_input
+    #print(fb_file)
+    #str(fb_file)
+    #print(fb_file$name)
+    folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
+    t <- paste(fb_file$datapath, ".xlsx", sep="")
+    
+    
+    
+  
+    fieldbook2 <- fb_data()
+    summaryfb <- summary_dframe()
+    fbchecks <- fb_checks()
+    #print(b)
+    wb <- openxlsx::loadWorkbook(fp)
+    sheets <- readxl::excel_sheets(path = fp)
+    fieldbook <- readxl::read_excel(fp,sheet = "Fieldbook")
+    fieldbook <- as.data.frame(fieldbook)
+    print(sheets)
+    
+    if("Fieldbook" %in% sheets){    
+    openxlsx::removeWorksheet(wb, "Fieldbook")
+    print("ok-1")
+    }
+    if("Summary by clone" %in% sheets){    
+    openxlsx::removeWorksheet(wb, "Summary by clone")
+    print("ok-2")
+    }
+    if("Check Format" %in% sheets){
+      openxlsx::removeWorksheet(wb, "Check Format")
+      print("ok-3")
+    }
+    
+    openxlsx::addWorksheet(wb = wb,sheetName = "Fieldbook",gridLines = TRUE)
+    openxlsx::addWorksheet(wb = wb,sheetName = "Summary by clone",gridLines = TRUE)
+    openxlsx::addWorksheet(wb = wb,sheetName = "Check Format",gridLines = TRUE)
+    #openxlsx::writeData(wb, sheet = "Fieldbook2", x = fieldbook2)
+    openxlsx::writeDataTable(wb,sheet = "Fieldbook",x = fieldbook2,colNames = TRUE,withFilter = FALSE)
+    openxlsx::writeDataTable(wb,sheet = "Summary by clone",x = summaryfb ,colNames = TRUE,withFilter = FALSE)
+    openxlsx::writeDataTable(wb,sheet = "Check Format",x = fbchecks ,colNames = TRUE,withFilter = FALSE)
+    openxlsx::saveWorkbook(wb = wb,file = fp,overwrite = TRUE) 
+    #if potato
+    #fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx"
+    
+    #
+    crop <- input$doe_type_crop
+    print(crop)
+    crop_dict <- getResourcePath("dictionary",crop)
+    print(crop_dict)
+    
+    
+    datadict <- readxl::read_excel(crop_dict,sheet = "Template for submission",skip = 5)    
+    nombres <- names(fieldbook)[4:ncol(fieldbook)]
+    
+    #Init ProgressBar
+    withProgress(message = "Downloading fieldbook...", value=0, {
+    
+            
+    lapply(nombres,function(x) por <- conditionalformat_trait(fp=fp,trait= x, datadict = datadict) )
+          
+    
+    conditionalFormat_cipnumber(fp,sheet="Fieldbook",cip_colname = "INSTN")
+    conditionalFormat_cipnumber(fp,sheet="Summary by clone",cip_colname = "INSTN")
+    
+    }) #Close progressBar
+    
+    shell.exec(fp)
+    
+    }) 
+  }
+)
+
 
 # output$independents <- renderUI({
 #   df <- fb_data()
@@ -159,12 +256,17 @@ output$dataviewer <- renderDataTable({
   if(is.null(fb_data)){iris}
   if(!is.null(fb_data)){
   
+    #Init ProgressBar
+    withProgress(message = "Checking Fieldbook...", value=0, {
     
     #if(is.null(input$independents)) fb_data()
     #if(!is.null(input$independents)) fb_data()[,input$independents]
     fb_data()
     
+    })
   }
+  
+    
   
  # })#end isolate
   

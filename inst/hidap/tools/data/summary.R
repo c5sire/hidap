@@ -22,10 +22,9 @@ output$ui_Summary <- renderUI({
     #tags$hr(),
     #     uiOutput("ui_action_sum"), 
     #     tags$hr(),
-    help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
+    #help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md"))) #'Fieldbook'=='View'
+    help_modal('Fieldbook','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
   )})
-
-
 
 # output$ui_action_sum <- renderUI({
 #   if (is.null(fb_data())) return()
@@ -48,8 +47,14 @@ summary_dframe <- reactive({
   if(!is.null(fb_data())){
  
     fb_data1 <- as.data.frame(fb_data())
-    fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx" 
-    datadict <- readxl::read_excel(fp12,sheet = "Template for submission",skip = 5)    
+    #fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx" 
+    crop <- input$doe_type_crop
+    print(crop)
+    crop_dict <- getResourcePath("dictionary",crop)
+    print(crop_dict)
+        
+    #datadict <- readxl::read_excel(fp12,sheet = "Template for submission",skip = 5)    
+    datadict <- readxl::read_excel(crop_dict,sheet = "Template for submission",skip = 5)
     datadict <- as.data.frame(datadict)   
 
     resu <- sbformula::sb_summary_excel(data = fb_data1,idx = 4,groupfactors = "INSTN",na.rm = TRUE,datadict = datadict)[1]  
@@ -103,7 +108,14 @@ output$datasummary <- renderDataTable({
 # #    print("===1====")
 # #     print(refresh_sumvar)
 
-   if(length(sumvar)==0){ summary_dframe()}
-   if(length(sumvar)>0){ summary_dframe()[, refresh_sumvar, drop=FALSE]}
-
+   if(length(sumvar)==0){ 
+#      b <- summary_dframe()
+#      save(b,file = "summary.rda")
+     summary_dframe()
+   }
+   if(length(sumvar)>0){ 
+#      b <- summary_dframe()[, refresh_sumvar, drop=FALSE]
+#      save(b,file = "summary.rda")
+     summary_dframe()[, refresh_sumvar, drop=FALSE]
+   }
 })

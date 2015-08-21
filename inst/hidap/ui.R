@@ -12,7 +12,7 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
   tabPanel("Data", withMathJax(), uiOutput('ui_data')),
   #tabPanel("Data", uiOutput('ui_data')),
   navbarMenu("Analysis",
-             tabPanel("ANOVA"),
+             tabPanel("ANOVA",uiOutput("single_anova")),
              tabPanel("MET-MultiEnviormental Analysis Trial"),
              tabPanel("Principal Component Analysis"),
              tabPanel("Single mean", uiOutput("single_mean")),
@@ -34,3 +34,4 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
   
   tags$head(tags$link(rel="shortcut icon", href="imgs/icon.png"))
 ))
+

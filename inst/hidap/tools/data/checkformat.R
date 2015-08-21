@@ -9,8 +9,9 @@ output$ui_Check <- renderUI({
     #tags$hr(),
     #     uiOutput("ui_action_sum"), 
     #     tags$hr(),
-    help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
-  )})
+    #help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
+    help_modal('Fieldbook','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md"))) 
+    )})
            
 
 # output$independents <- renderUI({
@@ -29,21 +30,43 @@ output$ui_Check <- renderUI({
 #     
 # })
 
+fb_checks <- reactive({
+  
+  fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx" 
+  datadict <- readxl::read_excel(fp12,sheet = "Template for submission",skip = 5)    
+  datadict <- as.data.frame(datadict)   
+  fb_check <- as.data.frame(fb_data())
+  
+  cipnumber_checks<- sbformula::sb_cipnumberquality(fb_check,"INSTN")
+  check_table<- lapply(4:ncol(fb_check),function(i) as.data.frame(sbformula::sb_qualityvar(data = fb_check,trait = names(fb_check)[i],datadict = datadict)))  
+  check_table <- as.data.frame(data.table::rbindlist(check_table)) 
+  names(check_table) <- "Checks"
+  print(check_table)
+  
+  check_general <- rbind(cipnumber_checks,check_table)
+  
+  
+})
+
+
 output$datacheckformat<- renderDataTable({
   
   if (is.null(input$action)) return()
   if (input$action==0) return()
 
-  fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx" 
-  datadict <- readxl::read_excel(fp12,sheet = "Template for submission",skip = 5)    
-  datadict <- as.data.frame(datadict)   
-  fb_check <- as.data.frame(fb_data())
-    #for (i in 4:ncol(fb_data1)){
-      #resu = merge(resu, sbformula::sb_qualityvar(data = fb_data,trait = "NMTP",datadict = datadict))
-    #} 
-   print(fb_check)
-   resu <- sbformula::sb_qualityvar(data = fb_check,trait = "MTWP",datadict = datadict)
-   #resu  <- as.data.frame(resu)  
-  #}
-
+#   fp12 <- "Z:\\hidap\\inst\\hidap\\ontologies\\ontologies_potato.xlsx" 
+#   datadict <- readxl::read_excel(fp12,sheet = "Template for submission",skip = 5)    
+#   datadict <- as.data.frame(datadict)   
+#   fb_check <- as.data.frame(fb_data())
+#     
+#   cipnumber_checks<- sbformula::sb_cipnumberquality(fb_check,"INSTN")
+#   
+#   check_table<- lapply(4:ncol(fb_check),function(i) as.data.frame(sbformula::sb_qualityvar(data = fb_check,trait = names(fb_check)[i],datadict = datadict)))  
+#   check_table <- as.data.frame(data.table::rbindlist(check_table)) 
+#   names(check_table) <- "Checks"
+#   print(check_table)
+#   
+#   check_general <- rbind(cipnumber_checks,check_table)
+    fb_checks()
+   
 })
