@@ -66,12 +66,8 @@ observe({
 
 #var_list <- data_dictionary(fp)
 
-
-
 # var_list <- data_dictionary(fp1)
 # 
-
-
 
 datasites <- data_sites()
 lcountries <- list_countries(datasites)

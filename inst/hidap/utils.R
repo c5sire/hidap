@@ -57,6 +57,24 @@ cropPath = function(getCurrentCrop){
 
 
 
+
+#### Utils functions to tranfers xlsx temp files to HIDAP data folders
+folder_file <-  function(file_name){
+  file_name %>% gsub(pattern = "_.*","",.) %>%  gsub(pattern = "[^0-9]*","",.)
+}
+
+trial_abb_file <- function(file_name){  
+  croptrial_abb <- gsub(pattern = "[a-z0-9].*","",file_name) #crop and trial abbreviation of files
+  pt_fix <- "PT" #for potato trial
+  sp_fix <- "SP" #for sweetpotato trial
+  #stringr::str_detect(string = croptrial ,pattern = r)
+  if(stringr::str_detect(croptrial_abb, pt_fix)) trial_abb <- gsub(pattern = pt_fix,"",croptrial_abb)
+  if(stringr::str_detect(croptrial_abb, sp_fix)) trial_abb  <- gsub(pattern = sp_fix, "",croptrial_abb ) 
+ trial_abb
+}
+
+
+
 ####################
 
 trait_type <- function(trait,datadict)
@@ -143,8 +161,6 @@ conditionalformat_trait <- function(fp,trait,datadict){
   openxlsx::saveWorkbook(wb,file = fp,overwrite = TRUE)
 }
 
-
-
 conditionalFormat_cipnumber <- function(fp,sheetName,cip_colname="INSTN"){
   wb <- openxlsx::loadWorkbook(fp)
   book <- readxl::read_excel(path = fp,sheet=sheetName)
@@ -164,7 +180,6 @@ conditionalFormat_cipnumber <- function(fp,sheetName,cip_colname="INSTN"){
   }
 }
 
-
 get.fb.param <-function(fp,sheet,param){
   params <- readxl::read_excel(path = fp, sheet = sheet)
   params <- as.data.frame(params)
@@ -172,9 +187,6 @@ get.fb.param <-function(fp,sheet,param){
   #for(i in 1:ncol(params)) params[,i]<-as.character(params[,i])
   params[params$Factor==param,2]
 }
-
-
-
 
 #get.fb.param(fp,"Installation","Experimental design")
 # 

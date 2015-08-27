@@ -1,74 +1,3 @@
-#############################################
-# View table output of the selected dataset
-#############################################
-#BEGIN Old CODE
-
-# output$uiView_vars <- renderUI({
-#   vars <- varnames()
-#   #vars <- vars()
-#   print(vars)
-#      selectInput("view_vars", "Select variables to show:", choices  = vars,
-#        selected = state_multiple("view_vars",vars, vars), multiple = TRUE,
-#        selectize = FALSE, size = min(15, length(vars)))
-#   #shiny::fileInput(inputId = "fb_view_vars",label ="Select your fieldbook" ,accept = c(".xlsx",".xls"))  
-#   
-#   
-#   #shiny::fileInput(inputId = "view_vars",label ="Select your fieldbook" ,accept = c(".xlsx",".xls"))  
-# })
-# 
-# vars <- reactive({
-#   validate(
-#     need(!is.null(varnames()), "No dataset chosen!")
-#   )
-#   get(varnames())
-# })
-# 
-# #observe(output$uiView_vars)({
-# output$ui_View <- renderUI({
-#   list(
-#     wellPanel(
-#       uiOutput("uiView_vars")
-#     ),
-#     help_modal('View','viewHelp',inclMD(file.path("..",app_dir,"tools/help/view.md")))
-# )}
-# )
-# 
-# output$dataviewer <- renderDataTable({
-# 
-#   if(input$view_vars %>% not_available) return()
-#   select_(.getdata(), .dots = input$view_vars)
-# 
-# }, options = list(orderClasses = TRUE, caseInsensitive = TRUE,
-#   lengthMenu = list(c(10, 25, 50, -1),c('10','25','50','All')),
-#   pageLength = 10, search = list(regex = TRUE)))
-
-
-# use DT to add dplyr - server side code
-# output$dataviewer <- DT::renderDataTable({
-
-#  if(input$view_vars %>% not_available) return()
-#  select_(.getdata(), .dots = input$view_vars) %>%
-#  DT::datatable(., server = TRUE)
-#})
-
-#options = list(orderClasses = TRUE, caseInsensitive = TRUE,
- # lengthMenu = list(c(10, 25, 50, -1),c('10','25','50','All')),
-#  pageLength = 10, search = list(regex = TRUE)))
-#END OLD CODE
-
-###################################################################################  
-#Begin NEW code
-
-# output$uiView_vars <- renderUI({
-#   #vars <- varnames()
-#   #vars <- vars()
-#   #print(vars)
-# #   selectInput("view_vars", "Select variables to show:", choices  = vars,
-# #     selected = state_multiple("view_vars",vars, vars), multiple = TRUE,
-# #     selectize = FALSE, size = min(15, length(vars)))
-#   shiny::fileInput(inputId = "view_vars",label ="Select your fieldbook" ,accept = c(".xlsx",".xls"))  
-# })
-
 #observe(output$uiView_vars)({
 output$ui_View <- renderUI({
   list(
@@ -149,19 +78,42 @@ output$ui.exportfb.action <- renderUI({
 shiny::observeEvent(input$exportfb_button, function(){
   isolate({ 
     #fp <-  "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-    fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
+    #fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
     
     
     fb_file <- input$view_vars_input
+    #print(input$view_vars_input)
+    fb_file_name <- fb_file$name
     #print(fb_file)
     #str(fb_file)
     #print(fb_file$name)
-    folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
-    t <- paste(fb_file$datapath, ".xlsx", sep="")
+    #folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
+    #t <- paste(fb_file$datapath, ".xlsx", sep="")
+    #print(input$view_vars_input)
+    #str(input$view_vars_input)
+    #print(fb_file_name)
+    fb_folder_file <- folder_file(fb_file_name) 
+    #print(fb_folder_file)
+    fb_trial_abb_file <- trial_abb_file(fb_file_name)  
+    #print(fb_trial_abb_file)
     
+    folder_to <- folderPath("data")
+    fb_temp_excel <- paste(fb_file$datapath,".xlsx",sep = "")
+        
+    dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
+    print(dir_name)
+    to <- file.path(dir_name,fb_file_name,sep = "")
+    print(to)
+    fp <- to
     
+    if(!file.exists(dir_name)) dir.create(dir_name,rec=T)
     
-  
+    #if(!file.exists(to)){
+      
+      
+      file.copy(from= fb_temp_excel,to=fp)
+    #}
+ 
     fieldbook2 <- fb_data()
     summaryfb <- summary_dframe()
     fbchecks <- fb_checks()
@@ -219,10 +171,12 @@ shiny::observeEvent(input$exportfb_button, function(){
     }) #Close progressBar
     
     shell.exec(fp)
+    #}
+    
     
     }) 
-  }
-)
+   
+})
 
 
 # output$independents <- renderUI({
@@ -271,6 +225,21 @@ output$dataviewer <- renderDataTable({
  # })#end isolate
   
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # use DT to add dplyr - server side code

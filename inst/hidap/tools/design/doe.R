@@ -843,7 +843,7 @@ add.vals.to.fb <- function(to, col.name, reactive_value,input_value,fb_reactive,
         nrep <- input$bibd_r       
       } 
 
-print("Disenos Pass")
+print("Disenos Ok")
   
     data_hidap[data_hidap$Factor=="Experimental design",col.name] <- paste(as.character(sdesign_name))
     data_hidap[data_hidap$Factor=="Number of repetitions or blocks",col.name] <- paste(as.character(nrep))

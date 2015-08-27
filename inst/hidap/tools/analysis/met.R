@@ -25,23 +25,23 @@ output$single_anova <- renderUI({
     
     mainPanel(
       #if (input$aov_run==0) return()
-        
+      
       verbatimTextOutput('aov.report')            
       
-      )  
+    )  
   )
- })
+})
 
 aov_fbdata <- reactive({
   fb_file <- input$aov_fbvars_input
- 
+  
   if(is.null(input$aov_fbvars_input)){return()}
   if(!is.null(fb_file)){
     #t <- paste(fb_file$datapath, ".xlsx", sep="")
     #str(t)
     #print(t)
     file.copy(fb_file$datapath,paste(fb_file$datapath, ".xlsx", sep=""))
-       
+    
     fieldbook <- readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""), sheet = "Fieldbook")
     fieldbook <- as.data.frame(fieldbook)
     
@@ -78,11 +78,11 @@ output$aov.fbtraits <- renderUI({
                  options = list(placeholder = 'Select trait(s)',
                                 plugins = list('remove_button'))
   )
-
+  
 })
 
 output$aov.fbgenotypes <- renderUI({
-   items <- aov_fbvars()
+  items <- aov_fbvars()
   selectizeInput("aov_fb_genotypes", label = "Genotypes",
                  #choices =  names(summary_dframe()),
                  choices = "INSTN",
@@ -107,16 +107,16 @@ output$aov.fbrep <- renderUI({
 
 output$ui.aov.run <- renderUI({
   #if (is.null(fb_data())) return()
-   
-   trait <- input$aov_fb_trait
-   genotypes <- input$aov_fb_genotypes
-   rep <- input$aov_fb_rep  
-     
-   if(length(trait)==0 || length(genotypes)==0 || length(rep)==0 || is.null(aov_fbdata())) return()
-   
-   #if(is.null(trait) & is.null(genotypes) & is.null(fbdata)) return()
-   
-   actionButton("aov_run", "Run ANOVA")
+  
+  trait <- input$aov_fb_trait
+  genotypes <- input$aov_fb_genotypes
+  rep <- input$aov_fb_rep  
+  
+  if(length(trait)==0 || length(genotypes)==0 || length(rep)==0 || is.null(aov_fbdata())) return()
+  
+  #if(is.null(trait) & is.null(genotypes) & is.null(fbdata)) return()
+  
+  actionButton("aov_run", "Run ANOVA")
 })
 
 output$aov.report  <-  reactivePrint(function() {
@@ -124,22 +124,22 @@ output$aov.report  <-  reactivePrint(function() {
   if (is.null(input$aov_run)) return()
   if (input$aov_run==0) return()
   
-   traits <- input$aov_fb_trait
-   #print(input$aov_fb_trait)
-   genotypes <-input$aov_fb_genotypes
-#   print(input$aov_fb_genotypes)
-   rep <- input$aov_fb_rep
-#   print(input$aov_fb_rep)
-   fbdata  <-  aov_fbdata()$fieldbook
-#   print(aov_fbdata)
-#   str(aov_fbdata)
-#   print(input$aov_run)
-#   
+  traits <- input$aov_fb_trait
+  #print(input$aov_fb_trait)
+  genotypes <-input$aov_fb_genotypes
+  #   print(input$aov_fb_genotypes)
+  rep <- input$aov_fb_rep
+  #   print(input$aov_fb_rep)
+  fbdata  <-  aov_fbdata()$fieldbook
+  #   print(aov_fbdata)
+  #   str(aov_fbdata)
+  #   print(input$aov_run)
+  #   
   if(is.null(traits) & is.null(genotypes) & is.null(fbdata)) return()
- 
+  
   #out <- capture.output(rcbd_anova(trait = "MTYNA",genotypes = "INSTN",repetitions = "REP",data = datos))
   #if(is.null(input$aov_run)) return()
-   
+  
   #lapply(traits, function(x) rcbd_anova(trait = x,genotypes = genotypes,repetitions = rep,data = fbdata))  
   aov_output_data <- list()
   for(i in 1:length(traits)){
@@ -147,7 +147,7 @@ output$aov.report  <-  reactivePrint(function() {
   }  
   names(aov_output_data) <- traits
   aov_output_data
-#capture.output(rcbd_anova(trait = traits,genotypes = genotypes,repetitions = rep,data = fbdata))
+  #capture.output(rcbd_anova(trait = traits,genotypes = genotypes,repetitions = rep,data = fbdata))
 })
 
 output$aov.export.action <- renderUI({
@@ -163,39 +163,8 @@ output$aov.export.action <- renderUI({
 shiny::observeEvent(input$aov_export_button, function(){
   isolate({ 
     fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-    
-    #if (is.null(input$aov.export.action)) return()
-    #if (input$aov.export.action==0) return()
-    
-    traits <- input$aov_fb_trait
-    print(input$aov_fb_trait)
-    genotypes <-input$aov_fb_genotypes
-    rep <- input$aov_fb_rep
-    fbdata  <-  aov_fbdata()$fieldbook
-    aov_output_data <- list()
-    for(i in 1:length(traits)){
-      aov_output_data[[i]] <- capture.output(rcbd_anova(trait = traits[i],
-                                                        genotypes = genotypes,repetitions = rep,data = fbdata))
-    }  
-    names(aov_output_data) <- traits
-    aov_output_data
-    
-    wb <- openxlsx::loadWorkbook(fp)
-    sheets <- readxl::excel_sheets(path = fp)
-    
-    for(i in 1:length(traits)){
-      if(traits[i] %in% sheets){
-        openxlsx::removeWorksheet(wb, traits[i])
-        cat("removed_sheet_trait_",traits[i])
-      }
-    }
+  
     
     
-    for(i in 1:length(traits)){
-    openxlsx::addWorksheet(wb = wb,sheetName = traits[i],gridLines = TRUE)
-    openxlsx::writeData(wb = wb,sheet = traits[i],x = aov_output_data[[i]])
-    openxlsx::saveWorkbook(wb = wb,file = fp,overwrite = TRUE) 
-    }
-    shell.exec(fp)
   })
 })
