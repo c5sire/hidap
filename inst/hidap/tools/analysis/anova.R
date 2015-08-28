@@ -162,7 +162,33 @@ output$aov.export.action <- renderUI({
 
 shiny::observeEvent(input$aov_export_button, function(){
   isolate({ 
-    fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
+    #fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
+    
+    aov_file <- input$aov_fbvars_input
+    aov_file_name <- aov_file$name
+    aov_file_datapath <- aov_file$datapath
+    #crop <- tolower(input$doe_type_crop) #in lowercase for identifying 
+    crop <- getcrop_file(aov_file_name)
+    aov_folder_file <- getfolder_file(aov_file_name) 
+    aov_trial_abb_file <- gettrial_abb_file(aov_file_name)  
+    folder_to <- folderPath("data")
+    
+    print(folder_to)
+    aov_temp_excel <- tempfile_name(aov_file_datapath) 
+    
+    print(aov_temp_excel)
+    aov_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=aov_folder_file,
+                                  file_name=aov_file_name)
+    print(aov_folder_path)
+    
+    fp <- aov_folder_path #file point
+    print(fp)
+     if(!file.exists(aov_folder_path)) dir.create(aov_folder_path,rec=T)    
+
+    file.copy(from= aov_temp_excel,to=fp)
+    
+    
+    
     
     #if (is.null(input$aov.export.action)) return()
     #if (input$aov.export.action==0) return()

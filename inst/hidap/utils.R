@@ -42,12 +42,15 @@ getResourcePath <- function(type="dictionary",crop){
   path = file.path(getBaseDir(),ext,fil)
   return(path)
 }
+#'@description This function gets the folde's path
 
 folderPath = function(folder){
   #  season = getSeason(pref.defaults)
   #  path = file.path(getBaseDir(),getCurrentCrop())
   file.path(getBaseDir(),folder)
 }
+
+#'@description This function gets the crop folders path in PC
 
 cropPath = function(getCurrentCrop){
   #  season = getSeason(pref.defaults)
@@ -59,24 +62,51 @@ cropPath = function(getCurrentCrop){
 
 
 #### Utils functions to tranfers xlsx temp files to HIDAP data folders
-folder_file <-  function(file_name){
+
+#'@description Function to get the folder file name given a shiny object (fileInput)
+getfolder_file <-  function(file_name){
   file_name %>% gsub(pattern = "_.*","",.) %>%  gsub(pattern = "[^0-9]*","",.)
 }
 
-trial_abb_file <- function(file_name){  
+#'@description Function to get the trial abbreviation file given a shiny object (fileInput)
+gettrial_abb_file <- function(file_name){  
   croptrial_abb <- gsub(pattern = "[a-z0-9].*","",file_name) #crop and trial abbreviation of files
   pt_fix <- "PT" #for potato trial
   sp_fix <- "SP" #for sweetpotato trial
+  cva_fix <- "CVA" # for cassava trial
   #stringr::str_detect(string = croptrial ,pattern = r)
   if(stringr::str_detect(croptrial_abb, pt_fix)) trial_abb <- gsub(pattern = pt_fix,"",croptrial_abb)
   if(stringr::str_detect(croptrial_abb, sp_fix)) trial_abb  <- gsub(pattern = sp_fix, "",croptrial_abb ) 
  trial_abb
+} #get the abbreviation file 
+
+#'@description Function to get the trial abbreviation file given a shiny object (fileInput)
+getcrop_file <- function(file_name){
+  if(stringr::str_detect(string = p,"PT")) crop <- "potato"
+  if(stringr::str_detect(string = p,"SP")) crop <- "sweetpotato"
+  if(stringr::str_detect(string = p,"CVA")) crop <- "cassava"
+  crop
+  
+}
+
+
+#'@description This function gives a xlsx file name for temporary files uplodad using SHINY.
+tempfile_name <-  function(file_name){
+  fb_temp_excel <- paste(file_name,".xlsx",sep = "")
+  fb_temp_excel
+}
+
+#dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
+folder_path  <- function(folder_to=NA,crop=NA,folder_file=NA,file_name){
+  path <- file.path(folder_to,crop,folder_file,sep = "")
+  newpath <- file.path(path,file_name,sep = "")
+  newpath
 }
 
 
 
 ####################
-
+#'@description Function to get the trait type given a data dictionary.
 trait_type <- function(trait,datadict)
 {
   tp <- as.character(datadict[datadict$ABBR==trait,c("TYPE")]) 
@@ -95,6 +125,8 @@ trait_type <- function(trait,datadict)
   return(tp)
 }
 
+#'@description Function to get the scale of differents trait, 
+#'dependig if Its continous/discrete/categorical variable
 scale_trait <- function(trait,datadict){
   
   tp <- trait_type(trait = trait,datadict = datadict)
@@ -119,7 +151,8 @@ scale_trait <- function(trait,datadict){
   
 }
 
-
+#'@description This function use openxlsx package to give conditional format (paint with colours) 
+#'for every trait column based on their own data dictionary.
 conditionalformat_trait <- function(fp,trait,datadict){ 
   
   wb <- openxlsx::loadWorkbook(fp)
@@ -161,6 +194,7 @@ conditionalformat_trait <- function(fp,trait,datadict){
   openxlsx::saveWorkbook(wb,file = fp,overwrite = TRUE)
 }
 
+#'@description This function paint wrong cip numbers in fieldbook using openxlsx package and regular expressions.
 conditionalFormat_cipnumber <- function(fp,sheetName,cip_colname="INSTN"){
   wb <- openxlsx::loadWorkbook(fp)
   book <- readxl::read_excel(path = fp,sheet=sheetName)
@@ -180,6 +214,7 @@ conditionalFormat_cipnumber <- function(fp,sheetName,cip_colname="INSTN"){
   }
 }
 
+#'@description This function gets parameters or values from fieldbook excel file. Do an excel scrapping.
 get.fb.param <-function(fp,sheet,param){
   params <- readxl::read_excel(path = fp, sheet = sheet)
   params <- as.data.frame(params)

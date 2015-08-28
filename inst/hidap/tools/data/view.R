@@ -84,6 +84,9 @@ shiny::observeEvent(input$exportfb_button, function(){
     fb_file <- input$view_vars_input
     #print(input$view_vars_input)
     fb_file_name <- fb_file$name
+    fb_file_datapath <- fb_file$datapath
+    #crop <- tolower(input$doe_type_crop) #in lowercase for identifying 
+    crop <- getcrop_file(fb_file_name)
     #print(fb_file)
     #str(fb_file)
     #print(fb_file$name)
@@ -92,28 +95,36 @@ shiny::observeEvent(input$exportfb_button, function(){
     #print(input$view_vars_input)
     #str(input$view_vars_input)
     #print(fb_file_name)
-    fb_folder_file <- folder_file(fb_file_name) 
+    fb_folder_file <- getfolder_file(fb_file_name) 
     #print(fb_folder_file)
-    fb_trial_abb_file <- trial_abb_file(fb_file_name)  
+    fb_trial_abb_file <- gettrial_abb_file(fb_file_name)  
     #print(fb_trial_abb_file)
-    
     folder_to <- folderPath("data")
-    fb_temp_excel <- paste(fb_file$datapath,".xlsx",sep = "")
-        
-    dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
-    print(dir_name)
-    to <- file.path(dir_name,fb_file_name,sep = "")
-    print(to)
-    fp <- to
     
-    if(!file.exists(dir_name)) dir.create(dir_name,rec=T)
-    
+    print(folder_to)
+    #fb_temp_excel <- paste(fb_file$datapath,".xlsx",sep = "")
+    fb_temp_excel <- tempfile_name(fb_file_datapath) 
+       
+    print(fb_temp_excel)
+    #dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
+    #fb_folder_path
+    #print(dir_name)
+    #to <- file.path(dir_name,fb_file_name,sep = "")
+    fb_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=fb_folder_file,
+                            file_name=fb_file_name)
+      print(fb_folder_path)
+      
+    fp <- fb_folder_path #file point
+     print(fp)
+#     fp <- to
+    #if(!file.exists(dir_name)) dir.create(dir_name,rec=T)
+    if(!file.exists(fb_folder_path)) dir.create(fb_folder_path,rec=T)    
+
+
     #if(!file.exists(to)){
-      
-      
-      file.copy(from= fb_temp_excel,to=fp)
+    file.copy(from= fb_temp_excel,to=fp)
     #}
- 
+    
     fieldbook2 <- fb_data()
     summaryfb <- summary_dframe()
     fbchecks <- fb_checks()
