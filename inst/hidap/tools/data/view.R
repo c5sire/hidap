@@ -78,52 +78,38 @@ output$ui.exportfb.action <- renderUI({
 shiny::observeEvent(input$exportfb_button, function(){
   isolate({ 
     #fp <-  "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-    #fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-    
-    
+     
     fb_file <- input$view_vars_input
-    #print(input$view_vars_input)
     fb_file_name <- fb_file$name
     fb_file_datapath <- fb_file$datapath
-    #crop <- tolower(input$doe_type_crop) #in lowercase for identifying 
     crop <- getcrop_file(fb_file_name)
-    #print(fb_file)
-    #str(fb_file)
-    #print(fb_file$name)
-    #folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
-    #t <- paste(fb_file$datapath, ".xlsx", sep="")
-    #print(input$view_vars_input)
-    #str(input$view_vars_input)
-    #print(fb_file_name)
     fb_folder_file <- getfolder_file(fb_file_name) 
-    #print(fb_folder_file)
     fb_trial_abb_file <- gettrial_abb_file(fb_file_name)  
-    #print(fb_trial_abb_file)
     folder_to <- folderPath("data")
-    
-    print(folder_to)
-    #fb_temp_excel <- paste(fb_file$datapath,".xlsx",sep = "")
     fb_temp_excel <- tempfile_name(fb_file_datapath) 
-       
-    print(fb_temp_excel)
-    #dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
-    #fb_folder_path
-    #print(dir_name)
-    #to <- file.path(dir_name,fb_file_name,sep = "")
-    fb_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=fb_folder_file,
-                            file_name=fb_file_name)
-      print(fb_folder_path)
-      
-    fp <- fb_folder_path #file point
-     print(fp)
-#     fp <- to
-    #if(!file.exists(dir_name)) dir.create(dir_name,rec=T)
+    fb_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=fb_folder_file)
+    fb_file_path <- new_file_path(folder_path=fb_folder_path,file_name=fb_file_name)  
+    fp <- fb_file_path #file point
+    #print(fp)
     if(!file.exists(fb_folder_path)) dir.create(fb_folder_path,rec=T)    
-
-
-    #if(!file.exists(to)){
     file.copy(from= fb_temp_excel,to=fp)
-    #}
+    
+    
+#     #### dasdas####
+#     aov_temp_excel <- tempfile_name(aov_file_datapath) 
+#     print("folder_path")
+#     aov_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=aov_folder_file)
+#     print("file_path")                              
+#     aov_file_path <- new_file_path(folder_path=aov_folder_path,file_name=aov_file_name)
+#     fp <- aov_file_path #file point
+#     print(fp)
+#     if(!file.exists(aov_folder_path)) dir.create(aov_folder_path,rec=T)   
+#     print("ok-exists")
+#     file.copy(from= aov_temp_excel,to=fp)
+#     print("ok-copy")
+#     #### end adsa ###    
+#     
+#     #}
     
     fieldbook2 <- fb_data()
     summaryfb <- summary_dframe()

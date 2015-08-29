@@ -3,167 +3,123 @@
 # sm_alt <- c("Two sided" = "two.sided", "Less than" = "less", "Greater than" = "greater")
 # sm_plots <- c("Histogram" = "hist", "Simulate" = "simulate")
 
-output$single_anova <- renderUI({
+output$met <- renderUI({
   
   
   sidebarLayout(
     sidebarPanel(
       
-      strong("Analysis: ANOVA"),
+      strong("Analysis: Multi-Environment (MET)"),
       hr(),
-      shiny::fileInput(inputId = "aov_fbvars_input",label ="Select your fieldbook" ,accept = c(".xlsx",".xls")),
+      shiny::fileInput(inputId = "met_fbvars_input",label ="Select your fieldbook",multiple = TRUE,accept = c(".xlsx")),
       hr(),
-      strong("Statistical Design"),
-      textOutput("aov.fb.design"),
-      hr(),
-      uiOutput("aov.fbtraits"),
-      uiOutput("aov.fbgenotypes"),
-      uiOutput("aov.fbrep"),
-      uiOutput('ui.aov.run'),
-      uiOutput('aov.export.action')
+      #strong("Statistical Design"),
+      #strong("Statistical Design"),
+      #textOutput("met.fb.design"),
+      #hr(),
+      #uiOutput("met.fbtraits"),
+      #uiOutput("met.fbgenotypes"),
+      #uiOutput("met.fbrep"),
+      #uiOutput('ui.met.run'),
+      uiOutput('met.export.action')
     ),
     
     mainPanel(
-      #if (input$aov_run==0) return()
+      #if (input$met_run==0) return()
       
-      verbatimTextOutput('aov.report')            
+      verbatimTextOutput('met.report')            
       
     )  
   )
 })
 
-aov_fbdata <- reactive({
-  fb_file <- input$aov_fbvars_input
+met_fbdata <- reactive({
   
-  if(is.null(input$aov_fbvars_input)){return()}
-  if(!is.null(fb_file)){
-    #t <- paste(fb_file$datapath, ".xlsx", sep="")
-    #str(t)
-    #print(t)
-    file.copy(fb_file$datapath,paste(fb_file$datapath, ".xlsx", sep=""))
-    
-    fieldbook <- readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""), sheet = "Fieldbook")
-    fieldbook <- as.data.frame(fieldbook)
-    
-    design <- get.fb.param(paste(fb_file$datapath, ".xlsx", sep=""),"Installation","Experimental design")  
-    
-    list(fieldbook=fieldbook,design=design)
-    
-    #print(fieldbook)
-  }
+
 })
 
-aov_fbvars <- reactive({
-  df <- aov_fbdata()$fieldbook
-  #if (is.null(df)) return(NULL)
-  if (is.null(df)) return(NULL)
-  items <- names(df)
-  names(items) <- items
-  out_item <- c("INSTN", "REP", "PLOT")
-  items <- items[!(items %in% out_item)]
+met_fbvars <- reactive({
+
   
 })
 
-output$aov.fb.design <- renderText({ 
-  aov_fbdata()$design
+output$met.fb.design <- renderText({ 
+
 })
 
-output$aov.fbtraits <- renderUI({
-  items <- aov_fbvars()
-  selectizeInput("aov_fb_trait", label = "Trait",
-                 #choices =  names(summary_dframe()),
-                 choices = items,
-                 selected = "", 
-                 multiple = TRUE,
-                 options = list(placeholder = 'Select trait(s)',
-                                plugins = list('remove_button'))
-  )
+output$met.fbtraits <- renderUI({
+ 
   
 })
 
-output$aov.fbgenotypes <- renderUI({
-  items <- aov_fbvars()
-  selectizeInput("aov_fb_genotypes", label = "Genotypes",
-                 #choices =  names(summary_dframe()),
-                 choices = "INSTN",
-                 selected = "", 
-                 multiple = TRUE,
-                 options = list(placeholder = 'Select genotypes',
-                                plugins = list('remove_button'))
-  )
+output$met.fbgenotypes <- renderUI({
+
 })
 
-output$aov.fbrep <- renderUI({
-  items <- aov_fbvars()
-  selectizeInput("aov_fb_rep", label = "Repetitions",
-                 #choices =  names(summary_dframe()),
-                 choices = "REP",
-                 selected = "", 
-                 multiple = TRUE,
-                 options = list(placeholder = 'Select Repetition Column',
-                                plugins = list('remove_button'))
-  )
+output$met.fbrep <- renderUI({
+ 
 })
 
-output$ui.aov.run <- renderUI({
-  #if (is.null(fb_data())) return()
-  
-  trait <- input$aov_fb_trait
-  genotypes <- input$aov_fb_genotypes
-  rep <- input$aov_fb_rep  
-  
-  if(length(trait)==0 || length(genotypes)==0 || length(rep)==0 || is.null(aov_fbdata())) return()
-  
-  #if(is.null(trait) & is.null(genotypes) & is.null(fbdata)) return()
-  
-  actionButton("aov_run", "Run ANOVA")
+output$ui.met.run <- renderUI({
+
 })
 
-output$aov.report  <-  reactivePrint(function() {
+output$met.report  <-  reactivePrint(func = function(){
   
-  if (is.null(input$aov_run)) return()
-  if (input$aov_run==0) return()
-  
-  traits <- input$aov_fb_trait
-  #print(input$aov_fb_trait)
-  genotypes <-input$aov_fb_genotypes
-  #   print(input$aov_fb_genotypes)
-  rep <- input$aov_fb_rep
-  #   print(input$aov_fb_rep)
-  fbdata  <-  aov_fbdata()$fieldbook
-  #   print(aov_fbdata)
-  #   str(aov_fbdata)
-  #   print(input$aov_run)
-  #   
-  if(is.null(traits) & is.null(genotypes) & is.null(fbdata)) return()
-  
-  #out <- capture.output(rcbd_anova(trait = "MTYNA",genotypes = "INSTN",repetitions = "REP",data = datos))
-  #if(is.null(input$aov_run)) return()
-  
-  #lapply(traits, function(x) rcbd_anova(trait = x,genotypes = genotypes,repetitions = rep,data = fbdata))  
-  aov_output_data <- list()
-  for(i in 1:length(traits)){
-    aov_output_data[[i]] <- capture.output(rcbd_anova(trait = traits[i],genotypes = genotypes,repetitions = rep,data = fbdata))
-  }  
-  names(aov_output_data) <- traits
-  aov_output_data
-  #capture.output(rcbd_anova(trait = traits,genotypes = genotypes,repetitions = rep,data = fbdata))
+  p <- input$met_fbvars_input
+  print(p)
+  print(str(p))
+  print(str(p))
+  print(p$datapath)
+  print(p$name)
+ 
 })
 
-output$aov.export.action <- renderUI({
-  trait <- input$aov_fb_trait
-  #print(input$aov_fb_trait)
-  genotypes <-input$aov_fb_genotypes
-  rep <- input$aov_fb_rep
-  fbdata  <-  aov_fbdata()$fieldbook
-  if(length(trait)==0 || length(genotypes)==0 || length(rep)==0 || is.null(aov_fbdata())) return()
-  actionButton("aov_export_button", "Export Anova Analysis")
+output$met.export.action <- renderUI({
+  if(is.null(input$met_fbvars_input)) return()
+  actionButton("met_export_button", "Export Anova Analysis")
+  
 })
 
-shiny::observeEvent(input$aov_export_button, function(){
+shiny::observeEvent(input$met_export_button, function(){
   isolate({ 
-    fp <- "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-  
+     
+    met_file <- input$met_fbvars_input
+    print(met_file)
+    met_file_name <- met_file$name
+    print(met_file_name)
+    met_file_datapath <- met_file$datapath
+    print(met_file_datapath)
+    #### met parameters #####
+    n <- length(met_file_name)
+    fp <- list()
+    for(i in 1:n){
+      
+      crop <- getcrop_file(met_file_name[i])
+     
+      met_folder_file <- getfolder_file(met_file_name[i]) 
+     
+      met_trial_abb_file <- gettrial_abb_file(met_file_name[i])  
+     
+      folder_to <- folderPath("data")
+     
+      met_temp_excel <- tempfile_name(met_file_datapath[i]) 
+      
+      met_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=met_folder_file[i])
+             
+      met_file_path <- new_file_path(folder_path=met_folder_path,file_name=met_file_name)
+      
+      ############
+      
+      fp[[i]] <- met_folder_path[i] #file point
+      #print(fp)
+      if(!file.exists(met_folder_path[i])) dir.create(met_folder_path[i],rec=T)    
+      file.copy(from= met_temp_excel[i],to=fp[[i]])
+      
+     print(fp[[i]])
+    }
+    
+        
     
     
   })

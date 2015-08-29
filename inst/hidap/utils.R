@@ -59,13 +59,12 @@ cropPath = function(getCurrentCrop){
 }
 
 
-
-
 #### Utils functions to tranfers xlsx temp files to HIDAP data folders
 
 #'@description Function to get the folder file name given a shiny object (fileInput)
 getfolder_file <-  function(file_name){
   file_name %>% gsub(pattern = "_.*","",.) %>%  gsub(pattern = "[^0-9]*","",.)
+  
 }
 
 #'@description Function to get the trial abbreviation file given a shiny object (fileInput)
@@ -78,6 +77,7 @@ gettrial_abb_file <- function(file_name){
   if(stringr::str_detect(croptrial_abb, pt_fix)) trial_abb <- gsub(pattern = pt_fix,"",croptrial_abb)
   if(stringr::str_detect(croptrial_abb, sp_fix)) trial_abb  <- gsub(pattern = sp_fix, "",croptrial_abb ) 
  trial_abb
+ print(trial_abb)
 } #get the abbreviation file 
 
 #'@description Function to get the trial abbreviation file given a shiny object (fileInput)
@@ -86,7 +86,7 @@ getcrop_file <- function(file_name){
   if(stringr::str_detect(string = p,"SP")) crop <- "sweetpotato"
   if(stringr::str_detect(string = p,"CVA")) crop <- "cassava"
   crop
-  
+  print(crop)
 }
 
 
@@ -94,15 +94,24 @@ getcrop_file <- function(file_name){
 tempfile_name <-  function(file_name){
   fb_temp_excel <- paste(file_name,".xlsx",sep = "")
   fb_temp_excel
+  print(fb_temp_excel)
 }
 
 #dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
-folder_path  <- function(folder_to=NA,crop=NA,folder_file=NA,file_name){
+#'@description This function gives the new folder_path for the temporary file
+folder_path  <- function(folder_to=NA,crop=NA,folder_file=NA){
   path <- file.path(folder_to,crop,folder_file,sep = "")
-  newpath <- file.path(path,file_name,sep = "")
-  newpath
+#   newpath <- file.path(path,file_name,sep = "")
+#   newpath
+  path
+  print(path)
 }
 
+new_file_path <- function(folder_path,file_name){
+  newpath <- file.path(folder_path,file_name,sep = "")
+  newpath
+  print(newpath)
+}
 
 
 ####################

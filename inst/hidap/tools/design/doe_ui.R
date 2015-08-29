@@ -612,7 +612,7 @@ output$doe <- renderUI({
                  downloadButton('downloadData', 'Download'),
                  actionButton("fieldbook_export_button_doe", "Click to export your fieldbook"),
                  p("Click on the procces"),               
-                 icon = icon("fa fa-table fa-2x")
+                 icon = icon("table", "fa-2x")
                
              )
         }),

@@ -82,9 +82,9 @@ output$datatabs <- renderUI({
 #       conditionalPanel("input.man_add_descr == false", uiOutput("dataDescriptionHTML")),
 #       conditionalPanel("input.man_add_descr == true", uiOutput("dataDescriptionMD"))),
     #tabPanel("View", dataTableOutput("dataviewer")),#'Fieldbook' == 'View'
-    tabPanel("Fieldbook", dataTableOutput("dataviewer")), #'Fieldbook' == 'View'
-    tabPanel("Summary", dataTableOutput("datasummary")),
-    tabPanel("Check_Format",dataTableOutput("datacheckformat"))
+    tabPanel("Fieldbook", dataTableOutput("dataviewer"),icon = icon(name = "calculator","fa-1x")), #'Fieldbook' == 'View'
+    tabPanel("Summary", dataTableOutput("datasummary"),icon = icon(name = "fax","fa-1x")),
+    tabPanel("Check_Format",dataTableOutput("datacheckformat"),icon = icon(name = "check-circle","fa-1x"))
     #tabPanel("View", tableOutput("dataviewer")),
 #     tabPanel("Edit", rHandsontableOutput("tabed_doe")),
 #     tabPanel("Visualize",plotOutput("visualize", width = "100%", height = "100%")),
