@@ -1,11 +1,10 @@
-#observe(output$uiView_vars)({
 output$ui_View <- renderUI({
   list(
     wellPanel(
       #uiOutput("uiView_vars")
      # shiny::fileInput(inputId = "view_vars",label ="Select your fieldbook" ,accept = c(".xlsx",".xls"))  
     ),
-     #uiOutput("dependent"),
+    #uiOutput("dependent"),
     #uiOutput("independents"),
     tags$hr(),
     uiOutput('ui.action'), 
@@ -21,49 +20,57 @@ output$ui_View <- renderUI({
 )})
 
 fb_data <- reactive({
-#vars <- fb_data
-  #fb_file <- input$view_vars
-#   print("===")
-#   print(input$view_vars)
-  #fb_file <- input$view_vars
   fb_file <- input$view_vars_input
-  #print(fb_file)
-  #str(fb_file)
-  #print(fb_file$name)
   folder_file <- fb_file$name %>% gsub(pattern = "_.*","",.) %>% gsub(pattern = "[^0-9]*","",.)
   print(folder_file)
   
-#   print("---2---")
-#   print(input$view_vars)
-#   print("---3---")
-#   print(fb_file)
-  #if(is.null(input$view_vars)){return()}
-  #if(!is.null(fb_file)){
+
   if(is.null(input$view_vars_input)){return()}
   if(!is.null(fb_file)){
-    #t <- paste(fb_file$datapath, ".xlsx", sep="")
-    #str(t)
-    #print(t)
     file.copy(fb_file$datapath,paste(fb_file$datapath, ".xlsx", sep=""))
-    
-    #fb_data <- read_excel(paste(fb_file$datapath, ".xlsx", sep=""), sheet = "Fieldbook")
     
     fieldbook <- readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""), sheet = "Fieldbook") 
     inst <- readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Installation") # reverted to xlsx so all formulas are read as values
     mgt  <-  readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Crop_management")
-    mtl	<-  readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Material List")
-    mml	<-  readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Minimal") # reverted to xlsx so all formulas are read as values
-    typ	<-  as.character(mml[mml$Factor=="Type of Trial","Value"])
+    mtl  <-  readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Material List")
+    mml	 <-  readxl::read_excel(paste(fb_file$datapath, ".xlsx", sep=""),"Minimal") # reverted to xlsx so all formulas are read as values
+    typ	 <-  as.character(mml[mml$Factor=="Type of Trial","Value"])
     plot_size <- as.numeric(inst[stringr::str_detect(inst$Factor,"Plot size"),"Value"])
     plant_den <- as.numeric(inst[stringr::str_detect(inst$Factor,"Planting density"),"Value"])
       
     fb_data <-  sbformula::sbcalculate(fb = fieldbook, plot.size = plot_size,plant.den = plant_den)   
-    #save(fb_data,file = "fieldbook.Rdata")
     fb_data
     
   #fb_data <- readxl::read_excel(fb_file <- paste(fb_file$datapath,".xls",sep = "") ,sheet = "Fieldbook")
   }
 })
+
+output$dataviewer <- renderDataTable({
+  if (is.null(input$action)) return()
+  if (input$action==0) return()
+  #isolate({ #begin isolate
+  
+  if(is.null(fb_data)){iris}
+  if(!is.null(fb_data)){
+  
+    #Init ProgressBar
+    withProgress(message = "Checking Fieldbook...", value=0, {
+    
+    #if(is.null(input$independents)) fb_data()
+    #if(!is.null(input$independents)) fb_data()[,input$independents]
+    fb_data()
+    
+    })
+  }
+  
+    
+  
+ # })#end isolate
+  
+})
+
+
+#BUTTONS FOR CALCULATE AND CHECK FIELDBOOK 
 
 output$ui.action <- renderUI({
   if (is.null(fb_data())) return()
@@ -78,7 +85,7 @@ output$ui.exportfb.action <- renderUI({
 shiny::observeEvent(input$exportfb_button, function(){
   isolate({ 
     #fp <-  "D:\\Users\\obenites\\Desktop\\Fieldbooks_Examples\\PTYL200211_CHIARA.xlsx"
-     
+    
     fb_file <- input$view_vars_input
     fb_file_name <- fb_file$name
     fb_file_datapath <- fb_file$datapath
@@ -94,23 +101,6 @@ shiny::observeEvent(input$exportfb_button, function(){
     if(!file.exists(fb_folder_path)) dir.create(fb_folder_path,rec=T)    
     file.copy(from= fb_temp_excel,to=fp)
     
-    
-#     #### dasdas####
-#     aov_temp_excel <- tempfile_name(aov_file_datapath) 
-#     print("folder_path")
-#     aov_folder_path <- folder_path(folder_to= folder_to,crop=crop,folder_file=aov_folder_file)
-#     print("file_path")                              
-#     aov_file_path <- new_file_path(folder_path=aov_folder_path,file_name=aov_file_name)
-#     fp <- aov_file_path #file point
-#     print(fp)
-#     if(!file.exists(aov_folder_path)) dir.create(aov_folder_path,rec=T)   
-#     print("ok-exists")
-#     file.copy(from= aov_temp_excel,to=fp)
-#     print("ok-copy")
-#     #### end adsa ###    
-#     
-#     #}
-    
     fieldbook2 <- fb_data()
     summaryfb <- summary_dframe()
     fbchecks <- fb_checks()
@@ -122,12 +112,12 @@ shiny::observeEvent(input$exportfb_button, function(){
     print(sheets)
     
     if("Fieldbook" %in% sheets){    
-    openxlsx::removeWorksheet(wb, "Fieldbook")
-    print("ok-1")
+      openxlsx::removeWorksheet(wb, "Fieldbook")
+      print("ok-1")
     }
     if("Summary by clone" %in% sheets){    
-    openxlsx::removeWorksheet(wb, "Summary by clone")
-    print("ok-2")
+      openxlsx::removeWorksheet(wb, "Summary by clone")
+      print("ok-2")
     }
     if("Check Format" %in% sheets){
       openxlsx::removeWorksheet(wb, "Check Format")
@@ -157,85 +147,23 @@ shiny::observeEvent(input$exportfb_button, function(){
     
     #Init ProgressBar
     withProgress(message = "Downloading fieldbook...", value=0, {
-    
-            
-    lapply(nombres,function(x) por <- conditionalformat_trait(fp=fp,trait= x, datadict = datadict) )
-          
-    
-    conditionalFormat_cipnumber(fp,sheet="Fieldbook",cip_colname = "INSTN")
-    conditionalFormat_cipnumber(fp,sheet="Summary by clone",cip_colname = "INSTN")
-    
+      
+      
+      lapply(nombres,function(x) por <- conditionalformat_trait(fp=fp,trait= x, datadict = datadict) )
+      
+      
+      conditionalFormat_cipnumber(fp,sheet="Fieldbook",cip_colname = "INSTN")
+      conditionalFormat_cipnumber(fp,sheet="Summary by clone",cip_colname = "INSTN")
+      
     }) #Close progressBar
     
     shell.exec(fp)
     #}
     
     
-    }) 
-   
-})
-
-
-# output$independents <- renderUI({
-#   df <- fb_data()
-#   if (is.null(df)) return(NULL)
-#   items=names(df)
-#   names(items)=items
-#   #selectInput("independents","Select the Variables of your fieldbook:",choices = items,selected = items,multiple=TRUE)
-#   #selectInput("independents","Select the Variables to summaryze",items,items,multiple=TRUE,selectize = TRUE)
-#   selectInput("independents","Select the Variables to summaryze",items,multiple=TRUE,selectize = TRUE)
-#   })
-
-# output$ui_action_sum <- renderUI({
-#   if (is.null(fb_data())) return()
-#   actionButton("action_sum", "Choose Variables to Sumarize:")
-# })
-
-
-# output$dataviewer <- renderTable({
-#   if(is.null(fb_data)){iris}
-#    if(!is.null(fb_data)){
-#   fb_data()
-#    }
-# })
-
-output$dataviewer <- renderDataTable({
-  if (is.null(input$action)) return()
-  if (input$action==0) return()
-  #isolate({ #begin isolate
-  
-  if(is.null(fb_data)){iris}
-  if(!is.null(fb_data)){
-  
-    #Init ProgressBar
-    withProgress(message = "Checking Fieldbook...", value=0, {
-    
-    #if(is.null(input$independents)) fb_data()
-    #if(!is.null(input$independents)) fb_data()[,input$independents]
-    fb_data()
-    
-    })
-  }
-  
-    
-  
- # })#end isolate
+  }) 
   
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

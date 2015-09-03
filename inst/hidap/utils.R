@@ -63,8 +63,9 @@ cropPath = function(getCurrentCrop){
 
 #'@description Function to get the folder file name given a shiny object (fileInput)
 getfolder_file <-  function(file_name){
-  file_name %>% gsub(pattern = "_.*","",.) %>%  gsub(pattern = "[^0-9]*","",.)
-  
+  folder_file <- file_name %>% gsub(pattern = "_.*","",.) %>%  gsub(pattern = "[^0-9]*","",.)
+  folder_file
+  print(folder_file)
 }
 
 #'@description Function to get the trial abbreviation file given a shiny object (fileInput)
@@ -82,13 +83,31 @@ gettrial_abb_file <- function(file_name){
 
 #'@description Function to get the trial abbreviation file given a shiny object (fileInput)
 getcrop_file <- function(file_name){
-  if(stringr::str_detect(string = p,"PT")) crop <- "potato"
-  if(stringr::str_detect(string = p,"SP")) crop <- "sweetpotato"
-  if(stringr::str_detect(string = p,"CVA")) crop <- "cassava"
+  if(grepl("PT",file_name))  crop <- "potato"
+  if(grepl("SP",file_name))  crop <- "sweetpotato"
+  if(grepl("CVA",file_name)) crop <- "cassava"
+  #crop
+  #if(stringr::str_detect(string = file_name,"PT"))  crop <- "potato"
+  #if(stringr::str_detect(string = file_name,"SP"))  crop <- "sweetpotato"
+  #if(stringr::str_detect(string = file_name,"CVA")) crop <- "cassava"
   crop
   print(crop)
 }
 
+gettrial_name <- function(file){ 
+  
+  if(grep) trial_name <- list(trial_name = "Yield")
+  if(trial_abb=="PTLB") trial_name <- list(trial_name = "Late Blight")
+  if(trial_abb=="STYL") trial_name <- list(trial_name = "Sweetpotato Yield" )
+  trial_name
+  
+}
+
+croptrials_name <- function(crop){
+     if(crop=="potato"){out <- list("Yield(PTYL)"="YL","Late Blight(LB)" ="LB")}
+     if(crop=="sweetpotato"){out <- list("Yield(STYL)"="YL","Morphology(SPMOR)" ="MOR")} 
+     out
+}
 
 #'@description This function gives a xlsx file name for temporary files uplodad using SHINY.
 tempfile_name <-  function(file_name){
@@ -99,7 +118,7 @@ tempfile_name <-  function(file_name){
 
 #dir_name <- file.path(folder_to,tolower(input$doe_type_crop),fb_folder_file,sep = "") 
 #'@description This function gives the new folder_path for the temporary file
-folder_path  <- function(folder_to=NA,crop=NA,folder_file=NA){
+folder_path  <- function(folder_to,crop,folder_file){
   path <- file.path(folder_to,crop,folder_file,sep = "")
 #   newpath <- file.path(path,file_name,sep = "")
 #   newpath
@@ -112,6 +131,30 @@ new_file_path <- function(folder_path,file_name){
   newpath
   print(newpath)
 }
+
+####FILENAME'S METADATA 
+
+#'@description  function to get the fieldbook's file name
+getfilename_book <- function(file_path){
+  output <- gsub(".*/",replacement = "",file_path) 
+  output
+}
+
+#'@description function to get data file name
+getdate_file<-function(file_name){ 
+  year <- str_sub(getfolder_file(file_name),1,4)
+  month <- str_sub(getfolder_file(file_name),5,6)
+  output <- list(year=year,month=month)
+}
+
+#'@description fuction to get the location o trial site of the file
+getlocation_file <- function(file_name){
+  output <-gsub(pattern = ".*_",replacement = "",x = file_name)
+  output <- gsub(pattern = ".xlsx",replacement = "",x = output)
+  #output <-grep(pattern = ".*_",x = file_name,value = "")
+  output
+}
+
 
 
 ####################

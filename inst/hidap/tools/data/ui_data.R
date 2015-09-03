@@ -41,9 +41,9 @@ output$ui_filter_error <- renderUI({
 # data ui and tabs
 output$ui_data <- renderUI({
   list(
-    includeCSS("../hidap/www/style.css"),
-    includeScript("../hidap/www/js/jquery-ui.custom.min.js"),
-    includeScript("../hidap/www/js/returnTextAreaBinding.js"),
+    #includeCSS("../hidap/www/style.css"),
+    #includeScript("../hidap/www/js/jquery-ui.custom.min.js"),
+    #includeScript("../hidap/www/js/returnTextAreaBinding.js"),
     sidebarLayout(
       sidebarPanel(
         # based on https://groups.google.com/forum/?fromgroups=#!topic/shiny-discuss/PzlSAmAxxwo

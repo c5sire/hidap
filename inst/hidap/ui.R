@@ -13,7 +13,7 @@ shinyUI(navbarPage(app_title, id = "nav_radiant", inverse = TRUE,
   #tabPanel("Data", uiOutput('ui_data')),icon("fa fa-table fa-2x")fa-medium glyphicon glyphicon-font
   navbarMenu("Analysis",
              shiny::tabPanel(" ANOVA",uiOutput("single_anova"),icon = icon("font",lib="glyphicon")),
-             shiny::tabPanel("Multi-Environment Analysis Trial (MET)",uiOutput("met"),icon = icon("cubes","fa-1x")),
+             shiny::tabPanel("Main effects and Multiplicative Interaction ",uiOutput("ammi"),icon = icon("cubes","fa-1x")),
              shiny::tabPanel("Principal Component Analysis",icon = icon("arrows","fa-1x")),
              shiny::tabPanel("Single mean", uiOutput("single_mean")),
              shiny::tabPanel("GWAS", uiOutput("ui_gwas")), icon = icon("line-chart","fa-2x")),

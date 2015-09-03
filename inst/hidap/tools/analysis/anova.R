@@ -25,9 +25,9 @@ output$single_anova <- renderUI({
     
     mainPanel(
       #if (input$aov_run==0) return()
-        
-      verbatimTextOutput('aov.report')            
-      
+        #hidap\inst\hidap\tools\analysis
+      verbatimTextOutput('aov.report')  # ,         
+      #includeMarkdown("inst/hidap/tools/analysis/anova.md")
       )  
   )
  })
@@ -105,6 +105,40 @@ output$aov.fbrep <- renderUI({
   )
 })
 
+output$aov.report  <-  reactivePrint(function() {
+  
+  if (is.null(input$aov_run)) return()
+  if (input$aov_run==0) return()
+  
+  traits <- input$aov_fb_trait
+  #print(input$aov_fb_trait)
+  genotypes <-input$aov_fb_genotypes
+  #   print(input$aov_fb_genotypes)
+  rep <- input$aov_fb_rep
+  #   print(input$aov_fb_rep)
+  fbdata  <-  aov_fbdata()$fieldbook
+  #   print(aov_fbdata)
+  #   str(aov_fbdata)
+  #   print(input$aov_run)
+  #   
+  if(is.null(traits) & is.null(genotypes) & is.null(fbdata)) return()
+  
+  #out <- capture.output(rcbd_anova(trait = "MTYNA",genotypes = "INSTN",repetitions = "REP",data = datos))
+  #if(is.null(input$aov_run)) return()
+  
+  #lapply(traits, function(x) rcbd_anova(trait = x,genotypes = genotypes,repetitions = rep,data = fbdata))  
+  aov_output_data <- list()
+  for(i in 1:length(traits)){
+    aov_output_data[[i]] <- capture.output(rcbd_anova(trait = traits[i],genotypes = genotypes,repetitions = rep,data = fbdata))
+  }  
+  names(aov_output_data) <- traits
+  aov_output_data
+  #capture.output(rcbd_anova(trait = traits,genotypes = genotypes,repetitions = rep,data = fbdata))
+})
+
+
+#### BUTTONS FOR ANOVA
+##
 output$ui.aov.run <- renderUI({
   #if (is.null(fb_data())) return()
    
@@ -117,37 +151,6 @@ output$ui.aov.run <- renderUI({
    #if(is.null(trait) & is.null(genotypes) & is.null(fbdata)) return()
    
    actionButton("aov_run", "Run ANOVA")
-})
-
-output$aov.report  <-  reactivePrint(function() {
-  
-  if (is.null(input$aov_run)) return()
-  if (input$aov_run==0) return()
-  
-   traits <- input$aov_fb_trait
-   #print(input$aov_fb_trait)
-   genotypes <-input$aov_fb_genotypes
-#   print(input$aov_fb_genotypes)
-   rep <- input$aov_fb_rep
-#   print(input$aov_fb_rep)
-   fbdata  <-  aov_fbdata()$fieldbook
-#   print(aov_fbdata)
-#   str(aov_fbdata)
-#   print(input$aov_run)
-#   
-  if(is.null(traits) & is.null(genotypes) & is.null(fbdata)) return()
- 
-  #out <- capture.output(rcbd_anova(trait = "MTYNA",genotypes = "INSTN",repetitions = "REP",data = datos))
-  #if(is.null(input$aov_run)) return()
-   
-  #lapply(traits, function(x) rcbd_anova(trait = x,genotypes = genotypes,repetitions = rep,data = fbdata))  
-  aov_output_data <- list()
-  for(i in 1:length(traits)){
-    aov_output_data[[i]] <- capture.output(rcbd_anova(trait = traits[i],genotypes = genotypes,repetitions = rep,data = fbdata))
-  }  
-  names(aov_output_data) <- traits
-  aov_output_data
-#capture.output(rcbd_anova(trait = traits,genotypes = genotypes,repetitions = rep,data = fbdata))
 })
 
 output$aov.export.action <- renderUI({
@@ -223,3 +226,5 @@ shiny::observeEvent(input$aov_export_button, function(){
     shell.exec(fp)
   })
 })
+
+
