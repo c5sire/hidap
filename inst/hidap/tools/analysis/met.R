@@ -171,12 +171,11 @@ output$ammi.report  <-  reactivePrint(function() {
     #ammmi_data
     ammi_output_data <- list()
     
-    for(i in 1:length(traits)){
-      ammi_output_data[[i]] <- st4gi::ammi(trait = traits[i] , geno = "INSTN", env = "LOCATION", rep = "REP", data = ammi_data1)
-#       names(ammi_output_data[[i]]) <- traits[i]
-#       print(ammi_output_data[[i]])
-    }  
-    ammi_output_data
+#     for(i in 1:length(traits)){
+#       ammi_output_data[[i]] <- st4gi::ammi(trait = traits[i] , geno = "INSTN", env = "LOCATION", rep = "REP", data = ammi_data1)
+# #       names(ammi_output_data[[i]]) <- traits[i]
+# #       print(ammi_output_data[[i]])
+#     }  
   
   })
 

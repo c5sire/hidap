@@ -205,12 +205,14 @@ scale_trait <- function(trait,datadict){
 
 #'@description This function use openxlsx package to give conditional format (paint with colours) 
 #'for every trait column based on their own data dictionary.
-conditionalformat_trait <- function(fp,trait,datadict){ 
+conditionalformat_trait <- function(fp,trait,datadict,fbSheet="Fieldbook"){ 
   
   wb <- openxlsx::loadWorkbook(fp)
-  fieldbook <- readxl::read_excel(fp,sheet = "Fieldbook")
+  #fieldbook <- readxl::read_excel(fp,sheet = "Fieldbook")
+  fieldbook <- readxl::read_excel(fp,sheet = fbSheet)
   fieldbook <- as.data.frame(fieldbook)
-  sheet <- "Fieldbook"  
+  #sheet <- "Fieldbook"  
+  sheet <- fbSheet
   # flag=TRUE #quantitative
   tp <- trait_type(trait=trait,datadict=datadict)
   out <-scale_trait(trait=trait,datadict=datadict) 
