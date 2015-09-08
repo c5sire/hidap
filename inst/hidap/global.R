@@ -11,12 +11,16 @@ library(rhandsontable)
 library(shinydashboard)
 library(leaflet)
 library(lubridate)
-
+library(shinyBS)
+library(rpivotTable)
+library(readxl)
+library(data.table)
+library(stringr)
 pkgs_cran <- c("car", "gridExtra", "GPArotation", "psych", "wordcloud",
                "AlgDesign", "knitr", "lubridate", "ggplot2", "ggdendro",
                "shiny", "pryr", "shiny", "magrittr", "tidyr", "dplyr",
-               "broom", "htmlwidgets")
-pkgs_gh <- c("shinyAce","rpivotTable")
+               "broom", "htmlwidgets","readxl","rhandsontable","stringr")
+pkgs_gh <- c("shinyAce","rpivotTable","shinyBS","rhandsontable")
 pkgs <- c(pkgs_cran, pkgs_gh)
 
 if(Sys.getenv('SHINY_PORT') == "") {
